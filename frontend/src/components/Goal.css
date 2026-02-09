@@ -1,0 +1,340 @@
+.goal {
+  height: 910px;
+  background-color: black;
+  padding: 0 120px;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.4s ease-out;
+}
+
+.goal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.goal-container {
+  height: 510px;
+  width: 100%;
+  margin-top: 100px;
+  margin-bottom: 450px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Верхний контейнер */
+.goal-top {
+  height: 160px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 250px;
+}
+
+.goal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.goal-subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  color: white;
+  opacity: 0.7;
+  margin-bottom: 10px;
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: all 0.3s ease-out 0.1s;
+}
+
+.goal-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 60px;
+  color: white;
+  line-height: 1.1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.title-line {
+  display: block;
+  letter-spacing: -1px;
+  margin-left: -2px;
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: all 0.3s ease-out;
+}
+
+.title-line:first-letter {
+  margin-left: 0;
+}
+
+.title-line:nth-child(1) {
+  transition-delay: 0.2s;
+}
+
+.title-line:nth-child(2) {
+  transition-delay: 0.3s;
+}
+
+.goal-description {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 20px; /* Уменьшил с 24px до 20px */
+  color: white;
+  opacity: 0.7;
+  width: 388px;
+  height: 90px;
+  text-align: left;
+  margin-top: 0;
+  opacity: 0;
+  transform: translateX(30px);
+  transition: all 0.3s ease-out 0.4s;
+  align-self: flex-end;
+  margin-top: 0px;
+}
+
+/* Нижний контейнер с шагами */
+.goal-bottom {
+  height: 204px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.goal-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  max-width: 317px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.3s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Эффект зеркального блеска */
+.goal-item::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  z-index: 1;
+}
+
+.goal-item:hover::before {
+  opacity: 1;
+  animation: shine 1.5s ease-in-out;
+}
+
+@keyframes shine {
+  0% {
+    transform: rotate(45deg) translateX(-100%);
+  }
+  50% {
+    transform: rotate(45deg) translateX(100%);
+  }
+  100% {
+    transform: rotate(45deg) translateX(100%);
+  }
+}
+
+/* Дополнительный эффект свечения */
+.goal-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 20%,
+    transparent 80%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: 8px;
+}
+
+.goal-item:hover::after {
+  opacity: 1;
+}
+
+.goal-number {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 70px; /* Уменьшил с 80px до 70px */
+  color: white;
+  line-height: 1;
+  margin-bottom: 35px; /* Уменьшил отступ */
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease-out;
+  position: relative;
+  z-index: 2;
+  animation: pulseNumber 4s ease-in-out infinite; /* Пульсация цифр */
+}
+
+@keyframes pulseNumber {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.goal-item:nth-child(2) .goal-number {
+  opacity: 0.7;
+  animation-delay: 0.5s; /* Задержка для второго шага */
+}
+
+.goal-item:nth-child(3) .goal-number {
+  animation-delay: 1s; /* Задержка для третьего шага */
+}
+
+.goal-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 28px; /* Уменьшил с 36px до 28px */
+  color: white;
+  line-height: 1.2;
+  opacity: 0.7;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease-out;
+  position: relative;
+  z-index: 2;
+  animation: pulseText 4s ease-in-out infinite; /* Пульсация текста */
+}
+
+@keyframes pulseText {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.02);
+  }
+}
+
+.goal-item:nth-child(2) .goal-text {
+  opacity: 1;
+  animation-delay: 0.5s; /* Задержка для второго шага */
+}
+
+.goal-item:nth-child(3) .goal-text {
+  animation-delay: 1s; /* Задержка для третьего шага */
+}
+
+/* Индивидуальные отступы для каждого шага */
+.goal-item:nth-child(1) .goal-number {
+  margin-bottom: 35px; /* Уменьшил с 45px */
+}
+
+.goal-item:nth-child(2) .goal-number {
+  margin-bottom: 32px; /* Уменьшил с 42px */
+}
+
+.goal-item:nth-child(3) .goal-number {
+  margin-bottom: 32px; /* Уменьшил с 42px */
+}
+
+/* Анимации при появлении */
+.goal.visible .goal-subtitle {
+  opacity: 0.7;
+  transform: translateX(0);
+}
+
+.goal.visible .title-line {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.goal.visible .goal-description {
+  opacity: 0.7;
+  transform: translateX(0);
+}
+
+.goal.visible .goal-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.goal.visible .goal-number {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.goal.visible .goal-item:nth-child(2) .goal-number {
+  opacity: 0.7;
+}
+
+.goal.visible .goal-text {
+  opacity: 0.7;
+  transform: translateY(0);
+}
+
+.goal.visible .goal-item:nth-child(2) .goal-text {
+  opacity: 1;
+}
+
+/* Задержки для шагов */
+.goal.visible .goal-item:nth-child(1) {
+  transition-delay: 0.5s;
+}
+
+.goal.visible .goal-item:nth-child(2) {
+  transition-delay: 0.6s;
+}
+
+.goal.visible .goal-item:nth-child(3) {
+  transition-delay: 0.7s;
+}
+
+.goal.visible .goal-item:nth-child(1) .goal-number {
+  transition-delay: 0.55s;
+}
+
+.goal.visible .goal-item:nth-child(2) .goal-number {
+  transition-delay: 0.65s;
+}
+
+.goal.visible .goal-item:nth-child(3) .goal-number {
+  transition-delay: 0.75s;
+}
+
+.goal.visible .goal-item:nth-child(1) .goal-text {
+  transition-delay: 0.6s;
+}
+
+.goal.visible .goal-item:nth-child(2) .goal-text {
+  transition-delay: 0.7s;
+}
+
+.goal.visible .goal-item:nth-child(3) .goal-text {
+  transition-delay: 0.8s;
+}

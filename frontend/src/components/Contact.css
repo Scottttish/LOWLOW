@@ -1,0 +1,318 @@
+.contact {
+  height: 803px;
+  background-color: black;
+  padding: 150px 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.6s ease-out;
+}
+
+.contact.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.contact-background {
+  position: absolute;
+  top: 150px;
+  left: 120px;
+  right: 120px;
+  bottom: 100px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.7;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.contact-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(1.5px);
+}
+
+.contact-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at top left, rgba(0,0,0,0.3) 0%, transparent 50%),
+    radial-gradient(circle at top right, rgba(0,0,0,0.3) 0%, transparent 50%),
+    radial-gradient(circle at bottom left, rgba(0,0,0,0.3) 0%, transparent 50%),
+    radial-gradient(circle at bottom right, rgba(0,0,0,0.3) 0%, transparent 50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.contact-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(45deg, rgba(0,0,0,0.2) 0%, transparent 20%),
+    linear-gradient(135deg, rgba(0,0,0,0.2) 0%, transparent 20%),
+    linear-gradient(225deg, rgba(0,0,0,0.2) 0%, transparent 20%),
+    linear-gradient(315deg, rgba(0,0,0,0.2) 0%, transparent 20%);
+  z-index: 1;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+}
+
+.contact-container {
+  width: 924px;
+  height: 303px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.contact-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: white;
+  width: 100%;
+}
+
+.contact-subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  color: white;
+  opacity: 0.7; /* 70% прозрачность */
+  margin-bottom: 10px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease-out 0.2s;
+}
+
+.contact-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 60px;
+  color: white;
+  line-height: 1.1;
+  margin: 0 0 35px 0;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease-out 0.4s;
+}
+
+.contact-button {
+  width: 264px;
+  height: 60px;
+  background-color: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0.7; /* 70% прозрачность */
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease-out 0.6s;
+}
+
+.contact-button:hover {
+  opacity: 1;
+  border-color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Анимации при появлении */
+.contact.visible .contact-subtitle {
+  opacity: 0.7; /* Возвращаем 70% прозрачность */
+  transform: translateY(0);
+}
+
+.contact.visible .contact-title {
+  opacity: 1; /* Заголовок без прозрачности */
+  transform: translateY(0);
+}
+
+.contact.visible .contact-button {
+  opacity: 0.7; /* Возвращаем 70% прозрачность */
+  transform: translateY(0);
+}
+
+/* Добавить в Contact.css */
+
+/* Модальное окно */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: #1A1A1A;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  color: white;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-instruction {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.modal-instruction h4 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 10px 0;
+  color: white;
+}
+
+.modal-instruction p {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+}
+
+.modal-instruction ul {
+  margin: 10px 0 0 0;
+  padding-left: 20px;
+}
+
+.modal-instruction li {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+.partnership-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: white;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.submit-button {
+  padding: 15px 30px;
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.submit-button:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+}

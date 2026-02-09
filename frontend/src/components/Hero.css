@@ -1,0 +1,105 @@
+.hero {
+  height: 922px;
+  padding: 0 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: black;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s ease-out;
+}
+
+.hero.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-container {
+  height: 522px;
+  width: 100%;
+  position: relative;
+  margin-bottom: 150px;
+}
+
+.images-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.8s ease-out 0.3s;
+}
+
+.hero.visible .images-container {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero-image {
+  position: absolute;
+  opacity: 0.8;
+  border-radius: 8px;
+  object-fit: cover;
+  transition: transform 0.1s ease-out;
+}
+
+.left-image {
+  width: 702px;
+  height: 322px;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  transform: translateX(-50px) translateY(50px);
+  transition: all 0.8s ease-out 0.5s;
+}
+
+.hero.visible .left-image {
+  opacity: 0.8;
+  transform: translateX(0) translateY(0);
+}
+
+.right-image {
+  width: 625px;
+  height: 439px;
+  top: 0;
+  right: 0;
+  opacity: 0;
+  transform: translateX(50px) translateY(-50px);
+  transition: all 0.8s ease-out 0.7s;
+}
+
+.hero.visible .right-image {
+  opacity: 0.8;
+  transform: translateX(0) translateY(0);
+}
+
+.hero-title {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 128px;
+  color: white;
+  margin: 0;
+  z-index: 2;
+  text-align: center;
+  opacity: 0;
+  transform: translate(-50%, -40%);
+  transition: all 0.8s ease-out 0.9s;
+}
+
+.hero.visible .hero-title {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+.title-transparent {
+  opacity: 0.7;
+}

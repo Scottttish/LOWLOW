@@ -1,0 +1,771 @@
+/* src/pages/AdminPanel/components/RestaurantsManagement/RestaurantsManagement.css */
+.restaurants-management-panel {
+  width: 100%;
+}
+
+.restaurants-management-content {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+}
+
+.restaurants-management-content.restaurants-content-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.restaurants-management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.restaurants-management-title {
+  font-size: 32px;
+  color: white;
+  margin: 0;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+}
+
+.restaurants-management-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.restaurants-create-company-btn {
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.restaurants-create-company-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.restaurants-create-company-btn:hover::before {
+  left: 100%;
+}
+
+.restaurants-create-company-btn:hover {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+}
+
+.restaurants-search-box {
+  position: relative;
+}
+
+.restaurants-search-input {
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: white;
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  width: 320px;
+  transition: all 0.3s ease;
+}
+
+.restaurants-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+}
+
+.restaurants-search-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
+.restaurants-filter-select {
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: white;
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  min-width: 200px;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+}
+
+.restaurants-filter-select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
+.restaurants-filter-select option {
+  background: #1a1a1a;
+  color: white;
+  padding: 12px;
+}
+
+/* Статистика */
+.restaurants-stats-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.restaurants-stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 28px;
+  flex: 1;
+  text-align: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.restaurants-stat-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.restaurants-stat-number {
+  font-size: 42px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.restaurants-stat-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Модальное окно */
+.restaurants-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+}
+
+.restaurants-modal-content {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.restaurants-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.restaurants-modal-header h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: white;
+  margin: 0;
+}
+
+.restaurants-modal-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.restaurants-modal-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  transform: rotate(90deg);
+}
+
+.restaurants-modal-body {
+  margin-bottom: 25px;
+}
+
+.restaurants-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.restaurants-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.restaurants-form-group label {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: white;
+  letter-spacing: 0.5px;
+}
+
+.restaurants-form-input {
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.restaurants-form-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.restaurants-form-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.restaurants-select-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+}
+
+.restaurants-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.restaurants-cancel-btn {
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.restaurants-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.restaurants-save-btn {
+  padding: 12px 24px;
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.restaurants-save-btn:hover {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+}
+
+/* Таблица */
+.restaurants-table-container {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.restaurants-management-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.restaurants-management-table th {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  padding: 18px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: 'Poppins', sans-serif;
+}
+
+.restaurants-management-table td {
+  padding: 18px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  animation: restaurantsFadeInUp 0.6s ease-out both;
+  font-family: 'Poppins', sans-serif;
+}
+
+.restaurants-management-table tr:last-child td {
+  border-bottom: none;
+}
+
+.restaurants-management-table tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateX(4px);
+  transition: all 0.3s ease;
+}
+
+/* Ячейки таблицы */
+.restaurant-id-cell {
+  font-family: 'Courier New', monospace;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.restaurant-info-cell .restaurant-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.restaurant-info-cell strong {
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+}
+
+.restaurant-info-cell span {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.restaurant-director-info {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-style: italic;
+  font-family: 'Poppins', sans-serif;
+}
+
+.restaurant-contact-cell div {
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Бейджи */
+.restaurant-city-badge {
+  background: rgba(52, 152, 219, 0.25);
+  color: #3498db;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(52, 152, 219, 0.3);
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.restaurant-hours-badge {
+  background: rgba(243, 156, 18, 0.25);
+  color: #f39c12;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(243, 156, 18, 0.3);
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* Действия - Компактные иконки на одном уровне */
+.restaurant-actions-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.restaurant-actions-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.restaurant-action-btn {
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.restaurant-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.restaurant-action-btn:hover::before {
+  left: 100%;
+}
+
+.restaurant-action-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.restaurant-edit-btn {
+  background: rgba(52, 152, 219, 0.2);
+  color: #3498db;
+  border: 2px solid rgba(52, 152, 219, 0.3);
+}
+
+.restaurant-edit-btn:hover {
+  background: rgba(52, 152, 219, 0.3);
+  color: #2980b9;
+}
+
+.restaurant-delete-btn {
+  background: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  border: 2px solid rgba(231, 76, 60, 0.3);
+}
+
+.restaurant-delete-btn:hover {
+  background: rgba(231, 76, 60, 0.3);
+  color: #c0392b;
+}
+
+/* Нет данных */
+.restaurants-no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.restaurants-no-data p {
+  font-size: 16px;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Анимации */
+@keyframes restaurantsFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+  .restaurants-management-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+  
+  .restaurants-management-controls {
+    flex-direction: column;
+  }
+  
+  .restaurants-search-input {
+    width: 100%;
+  }
+  
+  .restaurants-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .restaurants-stats-container {
+    flex-direction: column;
+  }
+  
+  .restaurants-management-table {
+    font-size: 13px;
+  }
+  
+  .restaurants-management-table th,
+  .restaurants-management-table td {
+    padding: 14px 12px;
+  }
+  
+  .restaurants-modal-content {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+  .restaurant-action-btn {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+  }
+  
+  .restaurant-action-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .restaurants-stats-container {
+    gap: 16px;
+  }
+  
+  .restaurants-stat-card {
+    padding: 20px;
+  }
+  
+  .restaurants-stat-number {
+    font-size: 32px;
+  }
+  
+  .restaurants-stat-label {
+    font-size: 12px;
+  }
+  
+  .restaurants-management-table {
+    font-size: 12px;
+  }
+  
+  .restaurants-management-table th,
+  .restaurants-management-table td {
+    padding: 12px 10px;
+  }
+  
+  .restaurants-modal-actions {
+    flex-direction: column;
+  }
+  
+  .restaurants-cancel-btn,
+  .restaurants-save-btn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .restaurant-actions-wrapper {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .restaurant-action-btn {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .restaurant-action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .restaurants-search-input,
+  .restaurants-filter-select,
+  .restaurants-form-input {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  
+  .restaurants-create-company-btn {
+    padding: 12px 20px;
+    font-size: 13px;
+  }
+}
+
+/* Стили для выпадающих списков */
+.restaurants-form-group select.restaurants-select-input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  padding: 12px 14px;
+  width: 100%;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.restaurants-form-group select.restaurants-select-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+/* Стили для опций выпадающего списка */
+.restaurants-form-group select.restaurants-select-input option {
+  background: #1a1a1a !important;
+  color: white !important;
+  padding: 10px;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+}
+
+.restaurants-form-group select.restaurants-select-input option:hover {
+  background: #2a2a2a !important;
+}
+
+.restaurants-form-group select.restaurants-select-input option:checked {
+  background: #3498db !important;
+  color: white !important;
+}
+
+/* Стили для выпадающего списка фильтра */
+.restaurants-filter-select {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 2px solid rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+}
+
+.restaurants-filter-select option {
+  background: #1a1a1a !important;
+  color: white !important;
+  padding: 10px;
+}
+
+.restaurants-filter-select option:hover {
+  background: #2a2a2a !important;
+}
+
+.restaurants-filter-select option:checked {
+  background: #3498db !important;
+  color: white !important;
+}
+
+/* Убираем стандартную стрелку и добавляем кастомную */
+.restaurants-select-input,
+.restaurants-filter-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 14px !important;
+}
+
+/* Для IE */
+.restaurants-select-input::-ms-expand,
+.restaurants-filter-select::-ms-expand {
+  display: none;
+}
+
+/* Стили при наведении */
+.restaurants-form-group select.restaurants-select-input:hover,
+.restaurants-filter-select:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Стили для disabled состояния */
+.restaurants-form-group select.restaurants-select-input:disabled,
+.restaurants-filter-select:disabled {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  cursor: not-allowed;
+}
+
+/* Дополнительные стили для лучшей совместимости */
+@media (max-width: 768px) {
+  .restaurants-form-group select.restaurants-select-input,
+  .restaurants-filter-select {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}

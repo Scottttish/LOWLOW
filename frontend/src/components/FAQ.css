@@ -1,0 +1,303 @@
+.faq {
+  height: 907px;
+  background-color: black;
+  padding: 150px 120px 0 120px;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.6s ease-out;
+}
+
+.faq.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.faq-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Верхний контейнер */
+.faq-top {
+  height: 195px;
+  margin-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out 0.2s;
+}
+
+.faq.visible .faq-top {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.faq-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.faq-subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  color: white;
+  opacity: 0.7;
+  margin-bottom: 10px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease-out 0.3s;
+}
+
+.faq.visible .faq-subtitle {
+  opacity: 0.7;
+  transform: translateY(0);
+}
+
+.faq-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 60px;
+  color: white;
+  line-height: 1.1;
+  margin: 0 0 10px 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease-out 0.4s;
+}
+
+.faq.visible .faq-title {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.faq-description {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  color: white;
+  opacity: 0.7;
+  line-height: 1.3;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease-out 0.5s;
+}
+
+.faq.visible .faq-description {
+  opacity: 0.7;
+  transform: translateY(0);
+}
+
+/* Нижний контейнер с аккордеоном */
+.faq-bottom {
+  height: 462px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out 0.6s;
+}
+
+.faq.visible .faq-bottom {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.faq-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 800px;
+}
+
+.faq-item {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 83px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+/* Анимации появления для каждого вопроса */
+.faq.visible .faq-item-1 {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all 0.5s ease-out 0.8s;
+}
+
+.faq.visible .faq-item-2 {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all 0.5s ease-out 0.9s;
+}
+
+.faq.visible .faq-item-3 {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all 0.5s ease-out 1.0s;
+}
+
+.faq.visible .faq-item-4 {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all 0.5s ease-out 1.1s;
+}
+
+.faq-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.faq-item:hover::before {
+  left: 100%;
+}
+
+.faq-item.active {
+  height: 152px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+}
+
+.faq-question {
+  width: 100%;
+  height: 83px;
+  background: none;
+  border: none;
+  padding: 0 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.faq-question::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #fff, transparent);
+  transition: width 0.4s ease;
+}
+
+.faq-item.active .faq-question::after {
+  width: 100%;
+}
+
+.faq-question:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateX(10px);
+}
+
+.question-text {
+  text-align: left;
+  position: relative;
+  z-index: 2;
+  width: 90%;
+}
+
+.faq-icon {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+  font-size: 32px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.faq-item.active .faq-icon {
+  transform: rotate(180deg);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.faq-answer {
+  padding: 0 30px;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.faq-item.active .faq-answer {
+  max-height: 69px;
+  padding: 20px 30px 25px 30px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.faq-answer p {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: white;
+  opacity: 0.7;
+  line-height: 1.4;
+  margin: 0;
+  animation: fadeInUp 0.5s ease 0.2s both;
+}
+
+/* Анимация появления текста ответа */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+}
+
+/* Эффект пульсации для иконки при hover */
+.faq-question:hover .faq-icon {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}

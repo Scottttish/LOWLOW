@@ -1,0 +1,475 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #000000;
+  color: #ffffff;
+}
+
+.register-container {
+  display: flex;
+  min-height: 100vh;
+  max-height: 100vh;
+  background: #000000;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 120px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Контейнер формы - теперь справа */
+.form-container {
+  width: 480px;
+  padding: 40px 0;
+}
+
+.register-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 12px;
+  color: #ffffff;
+  text-align: left;
+  letter-spacing: -0.5px;
+}
+
+.register-subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 0.85rem;
+  margin-bottom: 32px;
+  opacity: 0.7;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.register-form {
+  margin-bottom: 0;
+}
+
+.input-group {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+/* Поля ввода с плейсхолдерами вместо лейблов */
+.input-group input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.input-group input:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Стили для полей с ошибками */
+.input-group input.error {
+  border-color: #ff4444;
+  background: rgba(255, 68, 68, 0.08);
+}
+
+.input-group input.error:focus {
+  border-color: #ff4444;
+  box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.2);
+}
+
+.input-group input.error:hover {
+  border-color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+}
+
+/* Сообщения об ошибках */
+.error-message {
+  color: #ff4444;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.75rem;
+  margin-top: 6px;
+  padding-left: 4px;
+  animation: fadeIn 0.3s ease;
+}
+
+.checkbox-error {
+  margin-top: 8px;
+  margin-left: 26px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-options {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 0.8rem;
+  opacity: 0.9;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  line-height: 1.3;
+}
+
+.checkbox-label:hover {
+  opacity: 1;
+}
+
+.checkbox-label input {
+  display: none;
+}
+
+.checkmark {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  margin-right: 10px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.05);
+  margin-top: 1px;
+}
+
+.checkbox-label input:checked + .checkmark {
+  background: #ffffff;
+  border-color: #ffffff;
+  transform: scale(1.05);
+}
+
+.checkbox-label input:checked + .checkmark::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000000;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* Стили для чекбокса с ошибкой */
+.checkmark.error {
+  border-color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+}
+
+/* Кнопка Зарегистрироваться */
+.register-button {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  color: #000000;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 24px;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
+.register-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+}
+
+.register-button:active {
+  transform: translateY(0);
+}
+
+.login-link {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 0.8rem;
+  opacity: 0.8;
+  text-align: center;
+}
+
+.login-link a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  opacity: 1;
+  transition: all 0.3s ease;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Контейнер с фотками - теперь слева */
+.register-images-container {
+  width: 580px;
+  height: 660px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Свечение для контейнера с фотками */
+.register-images-container::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(255, 255, 255, 0.05) 75%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  border-radius: 24px;
+  z-index: -1;
+  filter: blur(12px);
+  opacity: 0.7;
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+.register-image-slider {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.image-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.image-slide::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(0,0,0,0.1) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
+  z-index: 1;
+}
+
+.image-slide.active {
+  opacity: 1;
+}
+
+.image-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+  transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.image-slide.active img {
+  transform: scale(1.05);
+}
+
+/* ОВАЛЬНЫЕ индикаторы */
+.image-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 3;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px 16px;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.image-indicator {
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.image-indicator.active {
+  background-color: #ffffff;
+  width: 36px;
+  transform: scale(1.1);
+}
+
+/* Анимация смены фоток */
+@keyframes slideAnimation {
+  0%, 18% { opacity: 1; transform: scale(1); }
+  20%, 100% { opacity: 0; transform: scale(1.1); }
+}
+
+.image-slide:nth-child(1) { animation: slideAnimation 30s infinite; }
+.image-slide:nth-child(2) { animation: slideAnimation 30s infinite 6s; }
+.image-slide:nth-child(3) { animation: slideAnimation 30s infinite 12s; }
+.image-slide:nth-child(4) { animation: slideAnimation 30s infinite 18s; }
+.image-slide:nth-child(5) { animation: slideAnimation 30s infinite 24s; }
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+/* Интенсивное свечение */
+.register-images-container {
+  width: 600px;
+  height: 670px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 40px rgba(255, 255, 255, 0.1),
+    0 0 80px rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.register-images-container::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  background: 
+    radial-gradient(
+      circle at 30% 30%,
+      rgba(255, 255, 255, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 70% 70%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    );
+  border-radius: 32px;
+  z-index: -1;
+  filter: blur(25px);
+  opacity: 0.6;
+  animation: glowRotate 8s linear infinite;
+}
+
+.register-images-container::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.05) 75%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  border-radius: 28px;
+  z-index: -1;
+  filter: blur(12px);
+  opacity: 0.4;
+}
+
+@keyframes glowRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+  .register-container {
+    flex-direction: column-reverse;
+    padding: 30px 20px;
+    gap: 30px;
+    max-height: none;
+    overflow-y: auto;
+  }
+  
+  .form-container {
+    width: 100%;
+    max-width: 350px;
+    padding: 0;
+  }
+  
+  .register-images-container {
+    width: 100%;
+    max-width: 400px;
+    height: 400px;
+  }
+  
+  .register-title {
+    font-size: 1.8rem;
+  }
+}
