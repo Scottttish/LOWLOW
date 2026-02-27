@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../../context/AuthContext';
 import './BusinessAccountSidebar.css';
 
-const BusinessAccountSidebar = ({ 
-  activeSection, 
-  setActiveSection, 
-  user, 
-  onLogout, 
-  onDeleteAccount 
+const BusinessAccountSidebar = ({
+  activeSection,
+  setActiveSection,
+  user,
+  onLogout,
+  onDeleteAccount
 }) => {
   const [companyData, setCompanyData] = useState({
     company_name: user?.company_name || 'Название компании',
@@ -59,19 +59,7 @@ const BusinessAccountSidebar = ({
     fetchCompanyData();
   }, [user]);
 
-  if (companyData.loading) {
-    return (
-      <div className="business-account-sidebar">
-        <div className="business-profile-card">
-          <div className="business-avatar-placeholder-large loading"></div>
-          <div className="business-info-sidebar">
-            <div className="business-name loading" style={{ width: '150px', height: '24px' }}></div>
-            <div className="business-email loading" style={{ width: '120px', height: '16px', marginTop: '8px' }}></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Removed loading state block to show sidebar immediately
 
   return (
     <div className="business-account-sidebar">
@@ -87,49 +75,49 @@ const BusinessAccountSidebar = ({
         </div>
         <div className="business-info-sidebar">
           <h3 className="business-name">
-            {companyData.company_name}
+            {companyData.loading ? 'Загрузка...' : companyData.company_name}
           </h3>
-          <p className="business-email">{user?.email || 'email@company.com'}</p>
+          <p className="business-email">{companyData.loading ? 'Загрузка...' : (user?.email || 'email@company.com')}</p>
           <span className="business-badge">Бизнес-аккаунт</span>
         </div>
       </div>
-      
+
       <nav className="business-account-nav">
-        <button 
+        <button
           className={`nav-item ${activeSection === 'profile' ? 'active' : ''}`}
           onClick={() => setActiveSection('profile')}
         >
           Бизнес-профиль
         </button>
-        <button 
+        <button
           className={`nav-item ${activeSection === 'products' ? 'active' : ''}`}
           onClick={() => setActiveSection('products')}
         >
           Мои продукты
         </button>
-        <button 
+        <button
           className={`nav-item ${activeSection === 'orders' ? 'active' : ''}`}
           onClick={() => setActiveSection('orders')}
         >
           История заказов
         </button>
-        <button 
+        <button
           className={`nav-item ${activeSection === 'location' ? 'active' : ''}`}
           onClick={() => setActiveSection('location')}
         >
           Местоположение
         </button>
-        
+
         <div className="nav-divider"></div>
-        
-        <button 
+
+        <button
           className="nav-item logout"
           onClick={onLogout}
         >
           Выйти из аккаунта
         </button>
-        
-        <button 
+
+        <button
           className="nav-item delete"
           onClick={() => {
             setActiveSection('delete');

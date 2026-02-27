@@ -16,20 +16,17 @@ router.get('/user/me/cart', authMiddleware, async (req, res) => {
         d.price,
         d.image_url as image,
         d.composition as description,
-        u.company_name as restaurant_name,
-        d.category_id,
-        c.name as category_name
+        r.company_name as restaurant_name
        FROM cart_items ci
        JOIN dishes d ON ci.dish_article = d.article
-       JOIN users u ON ci.restaurant_id = u.id
-       LEFT JOIN categories c ON d.category_id = c.id
+       JOIN restaurants r ON ci.restaurant_id = r.id
        WHERE ci.user_id = $1
        ORDER BY ci.created_at DESC`,
       [req.user.id]
     );
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       cart: cartResult.rows,
       count: cartResult.rows.reduce((sum, item) => sum + item.quantity, 0)
     });
@@ -45,9 +42,9 @@ router.post('/user/me/cart', authMiddleware, async (req, res) => {
     const { dish_article, quantity = 1, restaurant_id } = req.body;
 
     if (!dish_article || !restaurant_id) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'dish_article и restaurant_id обязательны' 
+      return res.status(400).json({
+        success: false,
+        message: 'dish_article и restaurant_id обязательны'
       });
     }
 
@@ -58,9 +55,9 @@ router.post('/user/me/cart', authMiddleware, async (req, res) => {
     );
 
     if (!dishResult.rows[0]) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Блюдо не найдено' 
+      return res.status(404).json({
+        success: false,
+        message: 'Блюдо не найдено'
       });
     }
 
@@ -71,7 +68,7 @@ router.post('/user/me/cart', authMiddleware, async (req, res) => {
     );
 
     let result;
-    
+
     if (existingCartItem.rows[0]) {
       // Обновляем количество
       result = await pool.query(
@@ -91,8 +88,8 @@ router.post('/user/me/cart', authMiddleware, async (req, res) => {
       );
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       item: result.rows[0],
       message: 'Добавлено в корзину'
     });
@@ -114,11 +111,11 @@ router.put('/user/me/cart/:item_id', authMiddleware, async (req, res) => {
         'DELETE FROM cart_items WHERE id = $1 AND user_id = $2',
         [item_id, req.user.id]
       );
-      
-      return res.json({ 
-        success: true, 
+
+      return res.json({
+        success: true,
         message: 'Удалено из корзины',
-        removed: true 
+        removed: true
       });
     }
 
@@ -131,14 +128,14 @@ router.put('/user/me/cart/:item_id', authMiddleware, async (req, res) => {
     );
 
     if (!result.rows[0]) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Элемент корзины не найден' 
+      return res.status(404).json({
+        success: false,
+        message: 'Элемент корзины не найден'
       });
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       item: result.rows[0],
       message: 'Количество обновлено'
     });
@@ -159,14 +156,14 @@ router.delete('/user/me/cart/:item_id', authMiddleware, async (req, res) => {
     );
 
     if (!result.rows[0]) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Элемент корзины не найден' 
+      return res.status(404).json({
+        success: false,
+        message: 'Элемент корзины не найден'
       });
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Удалено из корзины'
     });
   } catch (error) {
@@ -190,8 +187,8 @@ router.delete('/user/me/cart', authMiddleware, async (req, res) => {
 
     const result = await pool.query(query + ' RETURNING id', params);
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `Корзина ${restaurant_id ? 'ресторана' : ''} очищена`,
       count: result.rowCount
     });
@@ -204,14 +201,14 @@ router.delete('/user/me/cart', authMiddleware, async (req, res) => {
 // Оформить заказ с оплатой (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 router.post('/user/me/checkout', authMiddleware, async (req, res) => {
   let client;
-  
+
   try {
-    const { 
-      delivery_address, 
-      delivery_longitude, 
+    const {
+      delivery_address,
+      delivery_longitude,
       delivery_latitude,
       notes,
-      card_id 
+      card_id
     } = req.body;
 
     client = await pool.connect();
@@ -226,26 +223,26 @@ router.post('/user/me/checkout', authMiddleware, async (req, res) => {
         d.name as dish_name,
         d.price,
         d.composition as description,
-        u.company_name as restaurant_name
+        r.company_name as restaurant_name
        FROM cart_items ci
        JOIN dishes d ON ci.dish_article = d.article
-       JOIN users u ON ci.restaurant_id = u.id
+       JOIN restaurants r ON ci.restaurant_id = r.id
        WHERE ci.user_id = $1`,
       [req.user.id]
     );
 
     if (cartResult.rows.length === 0) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Корзина пуста' 
+      return res.status(400).json({
+        success: false,
+        message: 'Корзина пуста'
       });
     }
 
     // 2. Группируем по ресторанам
     const restaurants = {};
     let totalAmount = 0;
-    
+
     cartResult.rows.forEach(item => {
       const restaurantId = item.restaurant_id;
       if (!restaurants[restaurantId]) {
@@ -255,7 +252,7 @@ router.post('/user/me/checkout', authMiddleware, async (req, res) => {
           subtotal: 0
         };
       }
-      
+
       const itemTotal = item.price * item.quantity;
       restaurants[restaurantId].items.push({
         dish_article: item.dish_article, // article из dishes (например: "PIZ001")
@@ -277,19 +274,19 @@ router.post('/user/me/checkout', authMiddleware, async (req, res) => {
 
     if (!cardResult.rows[0]) {
       await client.query('ROLLBACK');
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Карта не найдена' 
+      return res.status(404).json({
+        success: false,
+        message: 'Карта не найдена'
       });
     }
 
     const card = cardResult.rows[0];
-    
+
     if (card.balance < totalAmount) {
       await client.query('ROLLBACK');
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Недостаточно средств на карте' 
+      return res.status(400).json({
+        success: false,
+        message: 'Недостаточно средств на карте'
       });
     }
 
@@ -301,10 +298,10 @@ router.post('/user/me/checkout', authMiddleware, async (req, res) => {
 
     // 5. Создаем заказы для каждого ресторана
     const orders = [];
-    
+
     for (const [restaurantId, restaurantData] of Object.entries(restaurants)) {
       const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}-${restaurantId}`;
-      
+
       const orderResult = await client.query(
         `INSERT INTO orders (
           user_id, order_number, total_amount, final_amount,
@@ -391,8 +388,8 @@ router.post('/user/me/checkout', authMiddleware, async (req, res) => {
 
     await client.query('COMMIT');
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Заказ успешно оформлен',
       orders,
       totalAmount
@@ -403,8 +400,8 @@ router.post('/user/me/checkout', authMiddleware, async (req, res) => {
       await client.query('ROLLBACK');
     }
     console.error('Error during checkout:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Ошибка при оформлении заказа',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });

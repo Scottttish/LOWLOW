@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../../context/AuthContext';
 import './BusinessAccountOrdersHistory.css';
+import '../../../../skeleton.css';
 
 const BusinessAccountOrdersHistory = () => {
   const { user, getBusinessOrders, updateOrderStatus } = useAuth();
@@ -15,13 +16,13 @@ const BusinessAccountOrdersHistory = () => {
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       const businessOrders = await getBusinessOrders();
-      
+
       if (businessOrders && Array.isArray(businessOrders)) {
         const formattedOrders = businessOrders.map(order => ({
           id: order.id,
@@ -37,11 +38,11 @@ const BusinessAccountOrdersHistory = () => {
             quantity: item.quantity || 1
           })) : []
         }));
-        
-        const sortedOrders = formattedOrders.sort((a, b) => 
+
+        const sortedOrders = formattedOrders.sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
         );
-        
+
         setOrders(sortedOrders);
       } else {
         setOrders([]);
@@ -64,10 +65,10 @@ const BusinessAccountOrdersHistory = () => {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       const updatedOrder = await updateOrderStatus(orderId, newStatus);
-      
+
       if (updatedOrder) {
-        setOrders(prevOrders => 
-          prevOrders.map(order => 
+        setOrders(prevOrders =>
+          prevOrders.map(order =>
             order.id === orderId ? { ...order, status: newStatus } : order
           )
         );
@@ -135,9 +136,9 @@ const BusinessAccountOrdersHistory = () => {
       const date = new Date(dateString);
       return {
         date: date.toLocaleDateString('ru-RU'),
-        time: date.toLocaleTimeString('ru-RU', { 
-          hour: '2-digit', 
-          minute: '2-digit' 
+        time: date.toLocaleTimeString('ru-RU', {
+          hour: '2-digit',
+          minute: '2-digit'
         })
       };
     } catch (e) {
@@ -155,17 +156,9 @@ const BusinessAccountOrdersHistory = () => {
     return orders.filter(order => order.status === status).length;
   };
 
-  if (loading) {
-    return (
-      <div className="business-account-section">
-        <div className="section-header">
-          <h2 className="section-title">Заказы клиентов</h2>
-        </div>
-        <div className="loading-state">
-          <p>Загрузка заказов...</p>
-        </div>
-      </div>
-    );
+  // Убираем отдельный экран загрузки, будем показывать скелетон
+  if (loading && orders.length === 0) {
+    // Не возвращаем ранний return, позволяем отрендерить структуру
   }
 
   if (error) {
@@ -229,9 +222,9 @@ const BusinessAccountOrdersHistory = () => {
                     </span>
                   </div>
                   <div className="order-status">
-                    <span 
+                    <span
                       className="status-badge"
-                      style={{ 
+                      style={{
                         backgroundColor: `${getStatusColor(order.status)}20`,
                         color: getStatusColor(order.status),
                         borderColor: `${getStatusColor(order.status)}40`
@@ -241,7 +234,7 @@ const BusinessAccountOrdersHistory = () => {
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="order-items">
                   {order.items && order.items.length > 0 ? (
                     order.items.map((item, index) => (
@@ -255,22 +248,22 @@ const BusinessAccountOrdersHistory = () => {
                     <div className="no-items">Нет товаров в заказе</div>
                   )}
                 </div>
-                
+
                 <div className="order-footer">
                   <div className="order-total">
                     Итого: <strong>{order.total ? order.total.toLocaleString('ru-RU') : '0'} ₸</strong>
                   </div>
-                  
+
                   <div className="order-actions">
                     {order.status === 'pending' && (
                       <>
-                        <button 
+                        <button
                           className="complete-order-btn"
                           onClick={() => handleStatusChange(order.id, 'completed')}
                         >
                           ✅ Получено
                         </button>
-                        <button 
+                        <button
                           className="cancel-order-btn"
                           onClick={() => handleStatusChange(order.id, 'cancelled')}
                         >
@@ -279,9 +272,9 @@ const BusinessAccountOrdersHistory = () => {
                       </>
                     )}
                     {(order.status === 'completed' || order.status === 'cancelled' || order.status === 'delivered') && (
-                      <span 
+                      <span
                         className="footer-status-text"
-                        style={{ 
+                        style={{
                           color: getFooterStatusColor(order.status),
                           fontSize: '14px',
                           fontWeight: '500',
@@ -302,8 +295,8 @@ const BusinessAccountOrdersHistory = () => {
         ) : (
           <div className="empty-state">
             <div className="empty-icon">📋</div>
-            <h3>Заказов пока нет</h3>
-            <p>Здесь будут отображаться заказы от ваших клиентов</p>
+            <h3>История заказов</h3>
+            <p>Здесь будут отображаться ваши заказы</p>
           </div>
         )}
       </div>

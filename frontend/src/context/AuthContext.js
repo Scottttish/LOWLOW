@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       setIsCheckingBackend(true);
-      
+
       const response = await fetch(`${API_BASE_URL}/health`, {
         method: 'GET',
         headers: { 'Accept': 'application/json' },
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       if (!token) {
         return false;
       }
-      
+
       const response = await fetch(`${API_BASE_URL}/api/account/user/me`, {
         method: 'GET',
         headers: {
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-        
+
         if (data.success && data.user) {
           const userData = {
             id: data.user.id,
@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }) => {
             longitude: data.user.longitude || null,
             latitude: data.user.latitude || null
           };
-          
+
           setUser(userData);
           return true;
         }
@@ -113,9 +113,9 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
         }
       }
-      
+
       return false;
-      
+
     } catch (error) {
       console.error('❌ Ошибка при проверке авторизации:', error);
       return false;
@@ -125,14 +125,14 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setLoading(true);
-      
+
       const loginData = {
         email: email.trim().toLowerCase(),
         password: password
       };
-      
+
       console.log('🔑 Отправка запроса на вход:', loginData.email);
-      
+
       const response = await fetch(`${API_AUTH_URL}/login`, {
         method: 'POST',
         headers: {
@@ -143,21 +143,21 @@ export const AuthProvider = ({ children }) => {
       });
 
       console.log('📡 Ответ сервера:', response.status);
-      
+
       const data = await response.json();
-      
+
       console.log('📊 Данные ответа:', {
         success: data.success,
         message: data.message,
         hasUser: !!data.data?.user,
         hasToken: !!data.data?.token
       });
-      
+
       if (response.ok && data.success) {
         if (data.data && data.data.user && data.data.token) {
           console.log('✅ Токен получен, сохраняем...');
           storeToken(data.data.token);
-          
+
           const userData = {
             id: data.data.user.id,
             name: data.data.user.name,
@@ -174,9 +174,9 @@ export const AuthProvider = ({ children }) => {
             longitude: data.data.user.longitude || null,
             latitude: data.data.user.latitude || null
           };
-          
+
           console.log('✅ Данные пользователя получены:', userData.email);
-          
+
           setUser(userData);
           return userData;
         } else {
@@ -185,11 +185,11 @@ export const AuthProvider = ({ children }) => {
         }
       } else {
         let errorMessage = data.message || 'Ошибка авторизации';
-        
+
         if (response.status === 401) {
           errorMessage = 'Неверный email или пароль';
         }
-        
+
         console.error('❌ Ошибка входа:', errorMessage);
         throw new Error(errorMessage);
       }
@@ -204,11 +204,11 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       setLoading(true);
-      
+
       if (!userData.nickname || !userData.email || !userData.password) {
         throw new Error('Заполните все обязательные поля');
       }
-      
+
       const registerData = {
         name: userData.nickname,
         email: userData.email.trim().toLowerCase(),
@@ -218,9 +218,9 @@ export const AuthProvider = ({ children }) => {
         city: userData.city || '',
         address: userData.address || ''
       };
-      
+
       console.log('📝 Регистрация пользователя:', registerData.email);
-      
+
       const response = await fetch(`${API_AUTH_URL}/register`, {
         method: 'POST',
         headers: {
@@ -231,23 +231,23 @@ export const AuthProvider = ({ children }) => {
       });
 
       console.log('📡 Ответ регистрации:', response.status);
-      
+
       const data = await response.json();
-      
+
       console.log('📊 Данные регистрации:', {
         success: data.success,
         message: data.message
       });
-      
+
       if (!response.ok || !data.success) {
         let errorMessage = data.message || 'Ошибка регистрации';
-        
+
         if (response.status === 409) {
           errorMessage = 'Пользователь с таким email уже существует';
         } else if (response.status === 400 && data.errors) {
           errorMessage = data.errors[0]?.msg || 'Ошибка валидации';
         }
-        
+
         console.error('❌ Ошибка регистрации:', errorMessage);
         throw new Error(errorMessage);
       }
@@ -279,9 +279,9 @@ export const AuthProvider = ({ children }) => {
         setUser(newUser);
         return newUser;
       }
-      
+
       throw new Error('Не удалось получить данные пользователя');
-      
+
     } catch (error) {
       console.error('❌ Ошибка регистрации:', error);
       throw error;
@@ -309,7 +309,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       clearToken();
       setUser(null);
-      
+
       if (window.location.pathname !== '/') {
         window.location.href = '/';
       }
@@ -320,11 +320,11 @@ export const AuthProvider = ({ children }) => {
     if (!user) {
       throw new Error('Пользователь не авторизован');
     }
-    
+
     try {
       setLoading(true);
       const token = getToken();
-      
+
       const response = await fetch(`${API_BASE_URL}/api/account/user/me`, {
         method: 'PUT',
         headers: {
@@ -336,7 +336,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка обновления пользователя');
       }
@@ -347,11 +347,11 @@ export const AuthProvider = ({ children }) => {
           ...updatedUserData,
           ...data.user
         };
-        
+
         setUser(updatedUser);
         return updatedUser;
       }
-      
+
       return user;
     } catch (error) {
       throw error;
@@ -364,7 +364,7 @@ export const AuthProvider = ({ children }) => {
     if (!user) {
       throw new Error('Пользователь не авторизован');
     }
-    
+
     return new Promise((resolve, reject) => {
       if (!file) {
         reject(new Error('Файл не выбран'));
@@ -382,12 +382,12 @@ export const AuthProvider = ({ children }) => {
       }
 
       const reader = new FileReader();
-      
+
       reader.onload = async (e) => {
         try {
           const avatarUrl = e.target.result;
           const token = getToken();
-          
+
           const response = await fetch(`${API_BASE_URL}/api/account/user/me/avatar`, {
             method: 'POST',
             headers: {
@@ -399,7 +399,7 @@ export const AuthProvider = ({ children }) => {
           });
 
           const data = await response.json();
-          
+
           if (!response.ok || !data.success) {
             throw new Error(data.message || 'Ошибка загрузки аватара');
           }
@@ -414,11 +414,11 @@ export const AuthProvider = ({ children }) => {
           reject(error);
         }
       };
-      
+
       reader.onerror = () => {
         reject(new Error('Ошибка чтения файла'));
       };
-      
+
       reader.readAsDataURL(file);
     });
   };
@@ -427,11 +427,11 @@ export const AuthProvider = ({ children }) => {
     if (!user) {
       throw new Error('Пользователь не авторизован');
     }
-    
+
     try {
       setLoading(true);
       const token = getToken();
-      
+
       const response = await fetch(`${API_BASE_URL}/api/account/user/me`, {
         method: 'DELETE',
         headers: {
@@ -441,16 +441,16 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка удаления пользователя');
       }
 
       setUser(null);
       clearToken();
-      
+
       return true;
-      
+
     } catch (error) {
       throw error;
     } finally {
@@ -463,7 +463,7 @@ export const AuthProvider = ({ children }) => {
   const addToCart = async (dish, restaurant) => {
     try {
       const token = getToken();
-      
+
       if (!token) {
         throw new Error('Пользователь не авторизован');
       }
@@ -485,13 +485,13 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка добавления в корзину');
       }
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: 'Добавлено в корзину',
         item: data.item
       };
@@ -504,7 +504,7 @@ export const AuthProvider = ({ children }) => {
   const getCart = async () => {
     try {
       const token = getToken();
-      
+
       if (!token) {
         return [];
       }
@@ -519,7 +519,7 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-        
+
         if (data.success) {
           return data.cart.map(item => ({
             id: item.id,
@@ -533,7 +533,7 @@ export const AuthProvider = ({ children }) => {
           }));
         }
       }
-      
+
       return [];
     } catch (error) {
       console.error('Error getting cart:', error);
@@ -544,7 +544,7 @@ export const AuthProvider = ({ children }) => {
   const updateCartItem = async (itemId, quantity) => {
     try {
       const token = getToken();
-      
+
       if (!token) {
         throw new Error('Пользователь не авторизован');
       }
@@ -560,7 +560,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка обновления корзины');
       }
@@ -575,7 +575,7 @@ export const AuthProvider = ({ children }) => {
   const removeFromCart = async (itemId) => {
     try {
       const token = getToken();
-      
+
       if (!token) {
         throw new Error('Пользователь не авторизован');
       }
@@ -589,7 +589,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка удаления из корзины');
       }
@@ -604,15 +604,15 @@ export const AuthProvider = ({ children }) => {
   const clearCart = async (restaurantId = null) => {
     try {
       const token = getToken();
-      
+
       if (!token) {
         throw new Error('Пользователь не авторизован');
       }
 
-      const url = restaurantId 
+      const url = restaurantId
         ? `${API_BASE_URL}/api/cart/user/me/cart?restaurant_id=${restaurantId}`
         : `${API_BASE_URL}/api/cart/user/me/cart`;
-      
+
       const response = await fetch(url, {
         method: 'DELETE',
         headers: {
@@ -622,7 +622,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка очистки корзины');
       }
@@ -637,7 +637,7 @@ export const AuthProvider = ({ children }) => {
   const checkout = async (checkoutData) => {
     try {
       const token = getToken();
-      
+
       if (!token) {
         throw new Error('Пользователь не авторизован');
       }
@@ -653,7 +653,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка при оформлении заказа');
       }
@@ -668,7 +668,7 @@ export const AuthProvider = ({ children }) => {
   const createOrder = async (orderData) => {
     try {
       const token = getToken();
-      
+
       if (!token) {
         throw new Error('Пользователь не авторизован');
       }
@@ -686,13 +686,13 @@ export const AuthProvider = ({ children }) => {
       }
 
       const cardsData = await cardsResponse.json();
-      
+
       if (!cardsData.success || !cardsData.cards || cardsData.cards.length === 0) {
         throw new Error('Добавьте карту для оплаты');
       }
 
       const defaultCard = cardsData.cards.find(card => card.is_default);
-      
+
       if (!defaultCard) {
         throw new Error('Добавьте карту для оплаты');
       }
@@ -713,7 +713,7 @@ export const AuthProvider = ({ children }) => {
   const getDefaultCard = async () => {
     try {
       const token = getToken();
-      
+
       if (!token) {
         return null;
       }
@@ -746,7 +746,7 @@ export const AuthProvider = ({ children }) => {
       console.error('❌ Только бизнес-аккаунты могут получать продукты');
       throw new Error('Только бизнес-аккаунты могут получать продукты');
     }
-    
+
     try {
       const token = getToken();
       const response = await fetch(`${API_BASE_URL}/api/business/products`, {
@@ -758,7 +758,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка получения продуктов');
       }
@@ -778,10 +778,10 @@ export const AuthProvider = ({ children }) => {
     if (!user || user.role !== 'business') {
       throw new Error('Только бизнес-аккаунты могут добавлять продукты');
     }
-    
+
     try {
       const token = getToken();
-      
+
       // Подготавливаем данные для отправки
       const requestData = {
         name: productData.name,
@@ -812,13 +812,13 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       console.log('📊 Ответ добавления продукта:', {
         status: response.status,
         success: data.success,
         message: data.message
       });
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка добавления продукта');
       }
@@ -838,10 +838,10 @@ export const AuthProvider = ({ children }) => {
     if (!user || user.role !== 'business') {
       throw new Error('Только бизнес-аккаунты могут обновлять продукты');
     }
-    
+
     try {
       const token = getToken();
-      
+
       // Подготавливаем данные для отправки
       const requestData = {
         name: productData.name,
@@ -875,7 +875,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       console.log('📊 Ответ обновления продукта:', {
         status: response.status,
         success: data.success,
@@ -902,7 +902,7 @@ export const AuthProvider = ({ children }) => {
     if (!user || user.role !== 'business') {
       throw new Error('Только бизнес-аккаунты могут удалять продукты');
     }
-    
+
     try {
       const token = getToken();
       const response = await fetch(`${API_BASE_URL}/api/business/products/${article}`, {
@@ -914,7 +914,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка удаления продукта');
       }
@@ -930,18 +930,18 @@ export const AuthProvider = ({ children }) => {
 
   const getBusinessOrders = async () => {
     console.log('🔄 [AUTH CONTEXT] Запрос заказов бизнеса');
-    
+
     if (!user || user.role !== 'business') {
       console.error('❌ Только бизнес-аккаунты могут получать заказы');
       throw new Error('Только бизнес-аккаунты могут получать заказы');
     }
-    
+
     try {
       const token = getToken();
       console.log('🔑 Токен:', token ? 'есть' : 'нет');
       console.log('👤 ID пользователя:', user.id);
       console.log('👤 Роль пользователя:', user.role);
-      
+
       if (!token) {
         throw new Error('Пользователь не авторизован');
       }
@@ -955,9 +955,9 @@ export const AuthProvider = ({ children }) => {
       });
 
       console.log('📡 Ответ сервера заказов:', response.status, response.statusText);
-      
+
       const data = await response.json();
-      
+
       console.log('📊 Данные ответа заказов:', {
         success: data.success,
         message: data.message,
@@ -965,14 +965,14 @@ export const AuthProvider = ({ children }) => {
         restaurant_found: data.restaurant_found,
         restaurant_id: data.restaurant_id
       });
-      
+
       if (!response.ok || !data.success) {
         console.error('❌ Ошибка получения заказов:', data.message);
         throw new Error(data.message || 'Ошибка получения заказов');
       }
 
       console.log('✅ Заказы успешно получены:', data.orders?.length || 0, 'шт');
-      
+
       if (data.orders && data.orders.length > 0) {
         console.log('📊 Пример заказа:', {
           id: data.orders[0].id,
@@ -992,15 +992,15 @@ export const AuthProvider = ({ children }) => {
 
   const updateOrderStatus = async (orderId, status) => {
     console.log(`🔄 [AUTH CONTEXT] Обновление статуса заказа ${orderId} на ${status}`);
-    
+
     if (!user || user.role !== 'business') {
       console.error('❌ Только бизнес-аккаунты могут обновлять статусы заказов');
       throw new Error('Только бизнес-аккаунты могут обновлять статусы заказов');
     }
-    
+
     try {
       const token = getToken();
-      
+
       if (!token) {
         throw new Error('Пользователь не авторизован');
       }
@@ -1016,14 +1016,14 @@ export const AuthProvider = ({ children }) => {
       });
 
       console.log('📡 Ответ обновления статуса:', response.status);
-      
+
       const data = await response.json();
-      
+
       console.log('📊 Данные обновления статуса:', {
         success: data.success,
         message: data.message
       });
-      
+
       if (!response.ok || !data.success) {
         console.error('❌ Ошибка обновления статуса заказа:', data.message);
         throw new Error(data.message || 'Ошибка обновления статуса заказа');
@@ -1043,7 +1043,7 @@ export const AuthProvider = ({ children }) => {
     if (!user || user.role !== 'business') {
       throw new Error('Только бизнес-аккаунты могут получать статистику');
     }
-    
+
     try {
       const token = getToken();
       const response = await fetch(`${API_BASE_URL}/api/business/products-stats`, {
@@ -1055,14 +1055,14 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         // Если эндпоинт не доступен, вычисляем локально
         const products = await getBusinessProducts();
         const totalProducts = products.length;
         const activeProducts = products.filter(p => p.is_active !== undefined ? p.is_active : (p.status === 'active')).length;
         const inactiveProducts = totalProducts - activeProducts;
-        
+
         return {
           stats: {
             total_products: totalProducts,
@@ -1080,7 +1080,7 @@ export const AuthProvider = ({ children }) => {
       const totalProducts = products.length;
       const activeProducts = products.filter(p => p.is_active !== undefined ? p.is_active : p.status === 'active').length;
       const inactiveProducts = totalProducts - activeProducts;
-      
+
       return {
         stats: {
           total_products: totalProducts,
@@ -1105,10 +1105,10 @@ export const AuthProvider = ({ children }) => {
     if (!user || user.role !== 'business') {
       throw new Error('Только бизнес-аккаунты могут сохранять локацию');
     }
-    
+
     try {
       const token = getToken();
-      
+
       const response = await fetch(`${API_BASE_URL}/api/account/user/me/location`, {
         method: 'PUT',
         headers: {
@@ -1116,16 +1116,16 @@ export const AuthProvider = ({ children }) => {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
         },
-        body: JSON.stringify({ 
-          longitude, 
-          latitude, 
+        body: JSON.stringify({
+          longitude,
+          latitude,
           city: city || user.city,
-          address: address || user.address 
+          address: address || user.address
         }),
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка сохранения локации');
       }
@@ -1151,7 +1151,7 @@ export const AuthProvider = ({ children }) => {
     if (!user || user.role !== 'business') {
       return null;
     }
-    
+
     try {
       const token = getToken();
       const response = await fetch(`${API_BASE_URL}/api/business/restaurant`, {
@@ -1163,7 +1163,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         return null;
       }
@@ -1179,7 +1179,7 @@ export const AuthProvider = ({ children }) => {
     if (!user || user.role !== 'business') {
       throw new Error('Только бизнес-аккаунты могут обновлять профиль ресторана');
     }
-    
+
     try {
       const token = getToken();
       const response = await fetch(`${API_BASE_URL}/api/business/restaurant`, {
@@ -1193,7 +1193,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка обновления профиля ресторана');
       }
@@ -1215,7 +1215,7 @@ export const AuthProvider = ({ children }) => {
     if (!user) {
       throw new Error('Пользователь не авторизован');
     }
-    
+
     try {
       const token = getToken();
       const response = await fetch(`${API_BASE_URL}/api/account/user/me/orders`, {
@@ -1227,7 +1227,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка получения заказов');
       }
@@ -1251,7 +1251,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка получения ресторанов');
       }
@@ -1266,14 +1266,11 @@ export const AuthProvider = ({ children }) => {
   const getRestaurantDishes = async (restaurantId) => {
     try {
       const token = getToken();
-      
+
       if (!token) {
-        console.error('Токен не найден');
         return [];
       }
 
-      console.log(`Запрос продуктов для ресторана ID: ${restaurantId}`);
-      
       const response = await fetch(`${API_BASE_URL}/api/dishes?restaurant_id=${restaurantId}`, {
         method: 'GET',
         headers: {
@@ -1283,19 +1280,15 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        console.error(`HTTP ошибка: ${response.status}`);
         return [];
       }
 
       const data = await response.json();
-      
+
       if (!data.success) {
-        console.log('Ошибка получения продуктов:', data.message);
         return [];
       }
 
-      console.log(`Получено ${data.dishes?.length || 0} продуктов`);
-      
       // Преобразуем данные для работы с is_active
       return (data.dishes || []).map(dish => ({
         ...dish,
@@ -1313,7 +1306,7 @@ export const AuthProvider = ({ children }) => {
     if (!user || user.role !== 'business') {
       throw new Error('Только бизнес-аккаунты могут создавать тестовые заказы');
     }
-    
+
     try {
       const token = getToken();
       const response = await fetch(`${API_BASE_URL}/api/business/test-order`, {
@@ -1325,7 +1318,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Ошибка создания тестового заказа');
       }
@@ -1343,21 +1336,21 @@ export const AuthProvider = ({ children }) => {
     }
 
     initializationStarted.current = true;
-    
+
     const init = async () => {
       try {
         const backendAvailable = await checkBackendAvailability();
         setIsBackendAvailable(backendAvailable);
-        
+
         if (backendAvailable) {
           const token = getToken();
           if (token) {
             await checkAuthStatus();
           }
         }
-        
+
         setIsInitialized(true);
-        
+
       } catch (error) {
         console.error('❌ Ошибка инициализации AuthContext:', error);
         setIsInitialized(true);
@@ -1374,16 +1367,16 @@ export const AuthProvider = ({ children }) => {
     isInitialized,
     isBackendAvailable,
     isCheckingBackend,
-    
+
     getToken,
-    
+
     register,
     login,
     logout,
     updateUser,
     uploadAvatar,
     deleteUser,
-    
+
     addToCart,
     getCart,
     updateCartItem,
@@ -1392,17 +1385,17 @@ export const AuthProvider = ({ children }) => {
     checkout,
     createOrder,
     getDefaultCard,
-    
+
     // Бизнес функции (продукты)
     getBusinessProducts,
     addBusinessProduct,
     updateBusinessProduct,
     deleteBusinessProduct,
-    
+
     // Бизнес функции (заказы)
     getBusinessOrders,
     updateOrderStatus,
-    
+
     // Бизнес функции (статистика и профиль)
     getBusinessStats,
     getCategories,
@@ -1410,21 +1403,340 @@ export const AuthProvider = ({ children }) => {
     getRestaurantProfile,
     updateRestaurantProfile,
     isBusiness,
-    
+
     // Общие функции
     getUserOrders,
     getRestaurants,
     getRestaurantDishes,
-    
+
     // Тестовые функции
     createTestOrder,
-    
+
     // Сервисные функции
     checkAuthStatus,
     checkBackendAvailability,
-    
-    API_BASE_URL,
-    API_AUTH_URL
+
+    // Admin Functions
+    getAllUsers: async () => {
+      try {
+        const token = getToken();
+        if (!token) throw new Error('No token');
+
+        const response = await fetch(`${API_BASE_URL}/api/admin/users?limit=1000`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+
+        return data.users || [];
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        return [];
+      }
+    },
+
+    getAllProducts: async () => {
+      try {
+        const token = getToken();
+        if (!token) throw new Error('No token');
+
+        const response = await fetch(`${API_BASE_URL}/api/admin/products?limit=1000`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+
+        return data.products || [];
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        return [];
+      }
+    },
+
+    adminUpdateUser: async (id, userData) => {
+      const token = getToken();
+      const response = await fetch(`${API_BASE_URL}/api/admin/users/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(userData)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      return data;
+    },
+
+    adminDeleteUser: async (id) => {
+      const token = getToken();
+      const response = await fetch(`${API_BASE_URL}/api/admin/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      return data;
+    },
+
+    adminUpdateUserAvatar: async (userId, avatarUrl) => {
+      try {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/avatar`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ avatarUrl })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        return data;
+      } catch (error) {
+        console.error('Error uploading user avatar by admin:', error);
+        throw error;
+      }
+    },
+
+    createBusinessUser: async (businessData) => {
+      const token = getToken();
+      const response = await fetch(`${API_BASE_URL}/api/admin/users/business`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(businessData)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      return data;
+    },
+
+    adminUpdateProduct: async (article, productData) => {
+      const token = getToken();
+      const response = await fetch(`${API_BASE_URL}/api/admin/products/${article}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(productData)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      return data;
+    },
+
+    adminDeleteProduct: async (article) => {
+      const token = getToken();
+      const response = await fetch(`${API_BASE_URL}/api/admin/products/${article}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      return data;
+    },
+
+    getActionLogs: async () => {
+      try {
+        const token = getToken();
+        if (!token) throw new Error('No token');
+
+        const response = await fetch(`${API_BASE_URL}/api/admin/action-logs`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        return data.logs;
+      } catch (error) {
+        console.error('Error fetching action logs:', error);
+        throw error;
+      }
+    },
+
+    undoAction: async (logId) => {
+      try {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/api/admin/action-logs/${logId}/undo`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        return data;
+      } catch (error) {
+        console.error('Error undoing action:', error);
+        throw error;
+      }
+    },
+
+    adminCreateUser: async (userData) => {
+      try {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(userData)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        return data;
+      } catch (error) {
+        console.error('Error creating user:', error);
+        throw error;
+      }
+    },
+
+    adminCreateProduct: async (productData) => {
+      try {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/api/admin/products`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(productData)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        return data;
+      } catch (error) {
+        console.error('Error creating product:', error);
+        throw error;
+      }
+    },
+
+    getPartnershipRequests: async () => {
+      try {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/api/partnership`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        return data.requests || [];
+      } catch (error) {
+        console.error('Error fetching partnership requests:', error);
+        return [];
+      }
+    },
+
+    updatePartnershipStatus: async (id, status) => {
+      try {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/api/partnership/${id}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ status })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        return data;
+      } catch (error) {
+        console.error('Error updating partnership status:', error);
+        throw error;
+      }
+    },
+
+    deletePartnershipRequest: async (id) => {
+      try {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/api/partnership/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message);
+        return data;
+      } catch (error) {
+        console.error('Error deleting partnership request:', error);
+        throw error;
+      }
+    },
+
+    getActionLogs: async () => {
+      try {
+        const token = getToken();
+        if (!token) throw new Error('No token');
+
+        const response = await fetch(`${API_BASE_URL}/api/admin/action-logs`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Ошибка сервера');
+        return data.logs || [];
+      } catch (error) {
+        console.error('Error fetching action logs:', error);
+        throw error;
+      }
+    },
+
+    undoAction: async (logId) => {
+      try {
+        const token = getToken();
+        if (!token) throw new Error('No token');
+
+        const response = await fetch(`${API_BASE_URL}/api/admin/action-logs/${logId}/undo`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Ошибка отмены');
+        return data;
+      } catch (error) {
+        console.error('Error undoing action:', error);
+        throw error;
+      }
+    }
   };
 
   return (

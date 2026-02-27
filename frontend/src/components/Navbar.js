@@ -30,7 +30,7 @@ const Navbar = () => {
       setTimeout(() => {
         const footer = document.getElementById('footer');
         if (footer) {
-          footer.scrollIntoView({ 
+          footer.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
           });
@@ -39,7 +39,7 @@ const Navbar = () => {
     } else {
       const footer = document.getElementById('footer');
       if (footer) {
-        footer.scrollIntoView({ 
+        footer.scrollIntoView({
           behavior: 'smooth',
           block: 'start'
         });
@@ -53,7 +53,7 @@ const Navbar = () => {
       setTimeout(() => {
         const section = document.getElementById(sectionId);
         if (section) {
-          section.scrollIntoView({ 
+          section.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
           });
@@ -62,7 +62,7 @@ const Navbar = () => {
     } else {
       const section = document.getElementById(sectionId);
       if (section) {
-        section.scrollIntoView({ 
+        section.scrollIntoView({
           behavior: 'smooth',
           block: 'start'
         });
@@ -106,7 +106,7 @@ const Navbar = () => {
       setTimeout(() => {
         const newsSection = document.getElementById('catalog');
         if (newsSection) {
-          newsSection.scrollIntoView({ 
+          newsSection.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
           });
@@ -115,7 +115,7 @@ const Navbar = () => {
     } else {
       const newsSection = document.getElementById('catalog');
       if (newsSection) {
-        newsSection.scrollIntoView({ 
+        newsSection.scrollIntoView({
           behavior: 'smooth',
           block: 'start'
         });
@@ -126,7 +126,7 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     setIsDropdownOpen(false);
-    
+
     // После выхода редиректим на главную
     if (location.pathname === '/admin') {
       navigate('/');
@@ -142,13 +142,13 @@ const Navbar = () => {
     return (
       <nav className="navbar">
         <div className="navbar-container">
-          <div className="logo" onClick={handleLogoClick} style={{cursor: 'pointer'}}>
+          <div className="logo" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
             //LOW<span className="logo-low">LOW</span>
           </div>
-          
+
           <div className="nav-right-section">
-            <div className="user-profile">
-              <div className="user-info" ref={dropdownRef} onClick={toggleDropdown}>
+            <div className="user-profile" ref={dropdownRef}>
+              <div className="user-info" onClick={toggleDropdown}>
                 <div className="user-avatar">
                   <div className="avatar-placeholder">
                     {user.nickname?.charAt(0).toUpperCase() || 'A'}
@@ -161,7 +161,7 @@ const Navbar = () => {
                 </div>
                 <span className={`dropdown-arrow ${isDropdownOpen ? 'open' : ''}`}>▼</span>
               </div>
-              
+
               {isDropdownOpen && (
                 <div className="admin-dropdown-menu">
                   <div className="dropdown-item" onClick={handleProfileClick}>
@@ -184,10 +184,10 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <div className="logo" onClick={handleLogoClick} style={{cursor: 'pointer'}}>
+        <div className="logo" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
           //LOW<span className="logo-low">LOW</span>
         </div>
-        
+
         <div className="nav-right-section">
           <div className="nav-links">
             <a href="#main" className="nav-link" onClick={(e) => {
@@ -205,7 +205,7 @@ const Navbar = () => {
               scrollToFooter();
             }}>Контакты</a>
           </div>
-          
+
           {user ? (
             <div className="user-profile">
               <div className="user-info" onClick={handleProfileClick}>
@@ -214,9 +214,9 @@ const Navbar = () => {
                     <img src={user.avatar} alt="Avatar" />
                   ) : (
                     <div className="avatar-placeholder">
-                      {user.firstName ? user.firstName.charAt(0).toUpperCase() : 
-                       user.nickname ? user.nickname.charAt(0).toUpperCase() : 
-                       user.email ? user.email.charAt(0).toUpperCase() : 'U'}
+                      {user.firstName ? user.firstName.charAt(0).toUpperCase() :
+                        user.nickname ? user.nickname.charAt(0).toUpperCase() :
+                          user.email ? user.email.charAt(0).toUpperCase() : 'U'}
                     </div>
                   )}
                 </div>

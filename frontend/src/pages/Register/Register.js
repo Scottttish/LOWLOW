@@ -1,7 +1,15 @@
+// frontend\src\pages\Register\Register.js
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { Eye, EyeOff } from 'lucide-react';
 import './Register.css';
+
+import food1 from '../../assets/images/food1.jpg';
+import food2 from '../../assets/images/food2.jpg';
+import food3 from '../../assets/images/food3.jpg';
+import food4 from '../../assets/images/food4.jpg';
+import food5 from '../../assets/images/food5.jpg';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -30,10 +38,22 @@ const Register = () => {
 
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [currentImage, setCurrentImage] = useState(0);
+
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  // Валидация форм
+  const images = [food1, food2, food3, food4, food5];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [images.length]);
+
   const validateField = (name, value) => {
     switch (name) {
       case 'nickname':
@@ -81,7 +101,7 @@ const Register = () => {
         [name]: validateField(name, fieldValue)
       }));
     }
-    
+
     if (submitError) setSubmitError('');
   };
 
@@ -100,10 +120,21 @@ const Register = () => {
     }));
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const handleIndicatorClick = (index) => {
+    setCurrentImage(index);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Помечаем все поля как touched для показа всех ошибок
+
     const allTouched = {
       nickname: true,
       email: true,
@@ -113,7 +144,6 @@ const Register = () => {
     };
     setTouched(allTouched);
 
-    // Валидируем все поля
     const newErrors = {
       nickname: validateField('nickname', formData.nickname),
       email: validateField('email', formData.email),
@@ -125,7 +155,6 @@ const Register = () => {
     setErrors(newErrors);
     setSubmitError('');
 
-    // Проверяем есть ли ошибки
     const hasErrors = Object.values(newErrors).some(error => error !== '');
     if (hasErrors) {
       return;
@@ -154,18 +183,41 @@ const Register = () => {
 
   return (
     <div className="register-container">
+      <div className="register-images-container">
+        <div className="register-image-slider">
+          {images.map((image, index) => (
+            <div
+              key={index}
+              className={`image-slide ${index === currentImage ? 'active' : ''}`}
+            >
+              <img src={image} alt={`Food ${index + 1}`} />
+            </div>
+          ))}
+        </div>
+
+        <div className="image-indicators">
+          {images.map((_, index) => (
+            <div
+              key={index}
+              className={`image-indicator ${index === currentImage ? 'active' : ''}`}
+              onClick={() => handleIndicatorClick(index)}
+            />
+          ))}
+        </div>
+      </div>
+
       <div className="form-container">
         <h1 className="register-title">Добро пожаловать</h1>
         <p className="register-subtitle">
           LOW.LOW - платформа, который спасает продукты перед сроком, продавая их дешевле
         </p>
-        
+
         {submitError && (
           <div className="error-message mb-3">
             ❌ {submitError}
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit} className="register-form" noValidate>
           <div className="input-group">
             <input
@@ -183,7 +235,7 @@ const Register = () => {
               <div className="error-message">{errors.nickname}</div>
             )}
           </div>
-          
+
           <div className="input-group">
             <input
               type="email"
@@ -200,41 +252,71 @@ const Register = () => {
               <div className="error-message">{errors.email}</div>
             )}
           </div>
-          
+
           <div className="input-group">
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Пароль"
-              required
-              disabled={loading}
-              className={touched.password && errors.password ? 'error' : ''}
-            />
+            <div className="password-input-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder="Пароль"
+                required
+                disabled={loading}
+                className={`password-input-with-eye ${touched.password && errors.password ? 'error' : ''}`}
+              />
+              <button
+                type="button"
+                className="password-toggle-unified"
+                onClick={togglePasswordVisibility}
+                disabled={loading}
+                aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
+              >
+                {showPassword ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
+              </button>
+            </div>
             {touched.password && errors.password && (
               <div className="error-message">{errors.password}</div>
             )}
           </div>
-          
+
           <div className="input-group">
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Подтвердите пароль"
-              required
-              disabled={loading}
-              className={touched.confirmPassword && errors.confirmPassword ? 'error' : ''}
-            />
+            <div className="password-input-wrapper">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder="Подтвердите пароль"
+                required
+                disabled={loading}
+                className={`password-input-with-eye ${touched.confirmPassword && errors.confirmPassword ? 'error' : ''}`}
+              />
+              <button
+                type="button"
+                className="password-toggle-unified"
+                onClick={toggleConfirmPasswordVisibility}
+                disabled={loading}
+                aria-label={showConfirmPassword ? "Скрыть пароль" : "Показать пароль"}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
+              </button>
+            </div>
             {touched.confirmPassword && errors.confirmPassword && (
               <div className="error-message">{errors.confirmPassword}</div>
             )}
           </div>
-          
+
           <div className="form-options">
             <label className="checkbox-label">
               <input
@@ -252,16 +334,16 @@ const Register = () => {
               <div className="error-message checkbox-error">{errors.agreeTerms}</div>
             )}
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="register-button"
             disabled={loading}
           >
             {loading ? 'Регистрация...' : 'Зарегистрироваться'}
           </button>
         </form>
-        
+
         <p className="login-link">
           Уже есть аккаунт? <Link to="/login">Войти</Link>
         </p>

@@ -24,7 +24,7 @@ const RestaurantDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user: currentUser, addToCart, getRestaurantDishes } = useAuth();
-  
+
   const [restaurant, setRestaurant] = useState(null);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -48,7 +48,7 @@ const RestaurantDetail = () => {
       navigate('/restaurants');
       return;
     }
-    
+
     loadRestaurantData();
   }, [id, currentUser, navigate]);
 
@@ -67,18 +67,15 @@ const RestaurantDetail = () => {
         return;
       }
 
-      console.log(`Загрузка ресторана ID: ${id}`);
-      
       const response = await fetch(`http://localhost:5000/api/restaurants/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.restaurant) {
-          console.log('Получен ресторан:', data.restaurant);
           const formattedRestaurant = {
             id: data.restaurant.id,
             user_id: data.restaurant.user_id,
@@ -98,7 +95,6 @@ const RestaurantDetail = () => {
           };
           setRestaurant(formattedRestaurant);
         } else {
-          console.log('Ресторан не найден в ответе');
           navigate('/restaurants');
         }
       } else {
@@ -116,11 +112,9 @@ const RestaurantDetail = () => {
   const loadProducts = async () => {
     try {
       setProductsLoading(true);
-      console.log('Загрузка продуктов для ресторана ID:', id);
-      
+
       const dishes = await getRestaurantDishes(id);
-      console.log('Полученные продукты с сервера:', dishes);
-      
+
       if (dishes && Array.isArray(dishes)) {
         // Преобразуем данные из базы в формат для фронта
         const processedProducts = dishes.map(dish => ({
@@ -137,12 +131,10 @@ const RestaurantDetail = () => {
           status: dish.status || 'active',
           restaurant_id: dish.restaurant_id
         }));
-        
-        console.log('Обработанные продукты:', processedProducts);
+
         setProducts(processedProducts);
         setFilteredProducts(processedProducts);
       } else {
-        console.log('Нет продуктов или неверный формат данных');
         setProducts([]);
         setFilteredProducts([]);
       }
@@ -159,7 +151,7 @@ const RestaurantDetail = () => {
     let filtered = products;
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(product => 
+      filtered = filtered.filter(product =>
         product.category === selectedCategory
       );
     }
@@ -201,9 +193,9 @@ const RestaurantDetail = () => {
         ...product,
         article: product.article || product.id
       };
-      
+
       const result = await addToCart(productToAdd, restaurant);
-      
+
       if (result.success) {
         showNotification(result.message, 'success');
         window.dispatchEvent(new Event('cartUpdated'));
@@ -276,7 +268,7 @@ const RestaurantDetail = () => {
               </div>
             )}
           </div>
-          
+
           <div className="restaurant-details-simple">
             <h1 className="restaurant-title-simple">{restaurant.companyName}</h1>
             {isRestaurantOwner && (
@@ -317,7 +309,7 @@ const RestaurantDetail = () => {
 
         <div className="products-section">
           <h2 className="products-title">Меню</h2>
-          
+
           {productsLoading ? (
             <div className="products-loading">
               <div className="loading-spinner"></div>
@@ -328,13 +320,13 @@ const RestaurantDetail = () => {
               <div className="no-products-icon">🍽️</div>
               <h3>Продукты не найдены</h3>
               <p>
-                {searchQuery || selectedCategory !== 'all' 
+                {searchQuery || selectedCategory !== 'all'
                   ? 'Попробуйте изменить поисковый запрос или выбрать другую категорию'
                   : 'В этом ресторане пока нет доступных продуктов'
                 }
               </p>
               {isRestaurantOwner && (
-                <button 
+                <button
                   className="add-products-btn"
                   onClick={() => navigate('/business-account?section=products')}
                 >
@@ -347,8 +339,8 @@ const RestaurantDetail = () => {
               {filteredProducts.map(product => (
                 <div key={product.article || product.id} className="product-card">
                   <div className="product-image">
-                    <img 
-                      src={product.image} 
+                    <img
+                      src={product.image}
                       alt={product.name}
                       onError={handleImageError}
                     />
@@ -358,17 +350,17 @@ const RestaurantDetail = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>
                     <p className="product-category">{product.category}</p>
-                    
+
                     {product.ingredients && (
                       <p className="product-ingredients">
                         {product.ingredients}
                       </p>
                     )}
-                    
+
                     <div className="product-footer">
                       <div className="product-price">
                         {product.price.toLocaleString()} ₸

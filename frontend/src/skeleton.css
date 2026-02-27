@@ -1,0 +1,66 @@
+/* Skeleton UI Animations */
+@keyframes skeleton-loading {
+  0% {
+    background-color: #f0f0f0;
+  }
+  50% {
+    background-color: #e0e0e0;
+  }
+  100% {
+    background-color: #f0f0f0;
+  }
+}
+
+.skeleton-card {
+  border: 1px solid #eee;
+  background: #fff;
+}
+
+.skeleton-box, .skeleton-text, .skeleton-btn, .skeleton-badge {
+  animation: skeleton-loading 1.5s infinite ease-in-out;
+  border-radius: 4px;
+}
+
+.skeleton-box {
+  width: 100%;
+  height: 200px;
+  background-color: #f0f0f0;
+}
+
+.skeleton-text {
+  height: 20px;
+  margin-bottom: 10px;
+  background-color: #f0f0f0;
+}
+
+.skeleton-text.title {
+  width: 70%;
+  height: 24px;
+}
+
+.skeleton-text.category {
+  width: 40%;
+}
+
+.skeleton-text.price {
+  width: 30%;
+  height: 24px;
+}
+
+.skeleton-text.qty {
+  width: 50%;
+}
+
+.skeleton-btn {
+  width: 100%;
+  height: 36px;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+}
+
+.skeleton-badge {
+  width: 100px;
+  height: 28px;
+  border-radius: 14px;
+  background-color: #f0f0f0;
+}

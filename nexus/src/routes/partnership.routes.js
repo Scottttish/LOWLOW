@@ -3,6 +3,10 @@ const express = require('express');
 const router = express.Router();
 const { pool } = require('../../aboba/index');
 const { authMiddleware, roleMiddleware } = require('../middleware/auth.middleware');
+const { logAction } = require('../utils/logger');
+const MailService = require('../services/mail.service');
+
+const mailService = new MailService();
 
 // Создать запрос на партнерство (публичный маршрут)
 router.post('/', async (req, res) => {
@@ -33,7 +37,7 @@ router.post('/', async (req, res) => {
         'SELECT id FROM users WHERE id = $1',
         [user_id]
       );
-      
+
       if (!userCheck.rows[0]) {
         console.log(`❌ Пользователь с ID ${user_id} не найден`);
       }
@@ -60,6 +64,14 @@ router.post('/', async (req, res) => {
 
     console.log('✅ Запрос на партнерство сохранен:', result.rows[0].id);
 
+    // Отправляем email уведомление пользователю
+    try {
+      await mailService.sendPartnershipSubmit(email);
+      console.log(`📧 Письмо-подтверждение отправлено на ${email}`);
+    } catch (mailError) {
+      console.error('❌ Ошибка отправки письма при подаче заявки:', mailError);
+    }
+
     res.json({
       success: true,
       request: result.rows[0],
@@ -67,8 +79,8 @@ router.post('/', async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Ошибка создания запроса на партнерство:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Ошибка сервера при создании запроса',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
@@ -98,15 +110,15 @@ router.get('/', authMiddleware, roleMiddleware('admin'), async (req, res) => {
 
     console.log(`✅ Найдено ${requestsResult.rows.length} запросов`);
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       requests: requestsResult.rows,
       count: requestsResult.rows.length
     });
   } catch (error) {
     console.error('❌ Ошибка получения запросов на партнерство:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Ошибка сервера при получении запросов'
     });
   }
@@ -140,6 +152,14 @@ router.delete('/:id', authMiddleware, roleMiddleware('admin'), async (req, res) 
 
     console.log(`✅ Запрос удален: ${result.rows[0].email}`);
 
+    // LOGGING
+    await logAction(
+      req.user.id,
+      'DELETE_PARTNERSHIP_REQUEST',
+      `Администратор удалил запрос на партнерство от ${result.rows[0].email}`,
+      { deletedRequest: result.rows[0] }
+    );
+
     res.json({
       success: true,
       message: 'Запрос удален',
@@ -147,8 +167,8 @@ router.delete('/:id', authMiddleware, roleMiddleware('admin'), async (req, res) 
     });
   } catch (error) {
     console.error('❌ Ошибка удаления запроса на партнерство:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Ошибка сервера при удалении запроса'
     });
   }
@@ -187,6 +207,27 @@ router.put('/:id/status', authMiddleware, roleMiddleware('admin'), async (req, r
 
     console.log(`✅ Статус запроса ${id} обновлен на ${status}`);
 
+    // Отправляем email в зависимости от нового статуса
+    try {
+      if (status === 'completed' || status === 'reviewed') {
+        await mailService.sendPartnershipApproval(result.rows[0].email);
+        console.log(`📧 Письмо об одобрении отправлено на ${result.rows[0].email}`);
+      } else if (status === 'rejected') {
+        await mailService.sendPartnershipRejection(result.rows[0].email);
+        console.log(`📧 Письмо об отказе отправлено на ${result.rows[0].email}`);
+      }
+    } catch (mailError) {
+      console.error(`❌ Ошибка отправки письма при изменении статуса (${status}):`, mailError);
+    }
+
+    // LOGGING
+    await logAction(
+      req.user.id,
+      'UPDATE_PARTNERSHIP_STATUS',
+      `Статус запроса от ${result.rows[0].email} изменен на "${status}"`,
+      { requestId: id, oldStatus: result.rows[0].status, newStatus: status, email: result.rows[0].email }
+    );
+
     res.json({
       success: true,
       request: result.rows[0],
@@ -194,8 +235,8 @@ router.put('/:id/status', authMiddleware, roleMiddleware('admin'), async (req, r
     });
   } catch (error) {
     console.error('❌ Ошибка обновления статуса запроса:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Ошибка сервера при обновлении статуса'
     });
   }
@@ -238,8 +279,8 @@ router.get('/stats', authMiddleware, roleMiddleware('admin'), async (req, res) =
     });
   } catch (error) {
     console.error('❌ Ошибка получения статистики запросов:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Ошибка сервера при получении статистики'
     });
   }

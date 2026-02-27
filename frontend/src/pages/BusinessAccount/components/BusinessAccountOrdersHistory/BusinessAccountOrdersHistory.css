@@ -10,6 +10,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -102,6 +103,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -330,37 +332,37 @@
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  
+
   .stat-card {
     padding: 20px;
     min-height: 100px;
   }
-  
+
   .stat-value {
     font-size: 24px;
   }
-  
+
   .order-header {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .order-footer {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .order-actions {
     width: 100%;
     justify-content: flex-start;
   }
-  
+
   .order-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .item-quantity,
   .item-price {
     margin-left: 20px;
@@ -371,35 +373,35 @@
   .order-card {
     padding: 20px;
   }
-  
+
   .empty-state {
     padding: 60px 20px;
   }
-  
+
   .empty-icon {
     font-size: 48px;
   }
-  
+
   .order-actions {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .complete-order-btn,
   .cancel-order-btn {
     width: 100%;
     text-align: center;
   }
-  
+
   .stat-card {
     padding: 16px;
     min-height: 90px;
   }
-  
+
   .stat-value {
     font-size: 22px;
   }
-  
+
   .stat-label {
     font-size: 13px;
   }

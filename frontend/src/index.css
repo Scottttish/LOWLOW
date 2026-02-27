@@ -10,3 +10,61 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* ===================================================
+   GLOBAL PASSWORD TOGGLE - Single source of truth
+   Applies to ALL pages: Login, Register, ForgotPassword,
+   UsersManagement, RestaurantsManagement
+   =================================================== */
+
+/* The wrapper MUST be position:relative for the toggle to work */
+.password-input-wrapper {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* Inputs inside the wrapper get right padding so text doesn't hide under toggle */
+.password-input-wrapper input {
+  width: 100% !important;
+  padding-right: 46px !important;
+}
+
+/* The toggle button: absolute, far right, grey, small, NO animation/movement */
+.password-toggle-unified {
+  position: absolute !important;
+  right: 10px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  /* Fixed, never moves */
+  z-index: 10 !important;
+
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+
+  background: #2a2a2a !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 6px !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+
+  /* Only allow color/border transitions — NO movement */
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
+  animation: none !important;
+  outline: none !important;
+}
+
+.password-toggle-unified:hover {
+  background: #3a3a3a !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.15) !important;
+  /* CRITICAL: keep same transform so button doesn't move */
+  transform: translateY(-50%) !important;
+}

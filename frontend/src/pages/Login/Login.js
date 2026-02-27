@@ -1,10 +1,10 @@
-// frontend/src/pages/Login/Login.js
+// frontend\src\pages\Login\Login.js
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { Eye, EyeOff } from 'lucide-react';
 import './Login.css';
 
-// Импортируем изображения
 import food1 from '../../assets/images/food1.jpg';
 import food2 from '../../assets/images/food2.jpg';
 import food3 from '../../assets/images/food3.jpg';
@@ -17,23 +17,21 @@ const Login = () => {
     password: '',
     rememberMe: false
   });
-
   const [currentImage, setCurrentImage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [loginStatus, setLoginStatus] = useState('');
-  
+  const [showPassword, setShowPassword] = useState(false);
+
   const { login, isBackendAvailable, isCheckingBackend } = useAuth();
   const navigate = useNavigate();
 
   const images = [food1, food2, food3, food4, food5];
 
-  // Автоматическая смена фоток
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % images.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, [images.length]);
 
@@ -43,47 +41,42 @@ const Login = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
+
     if (error) setError('');
     if (loginStatus) setLoginStatus('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.email.trim()) {
       setError('Введите email');
       return;
     }
-    
+
     if (!formData.password) {
       setError('Введите пароль');
       return;
     }
-    
+
     if (formData.password.length < 6) {
       setError('Пароль должен быть не менее 6 символов');
       return;
     }
-    
+
     setLoading(true);
     setError('');
     setLoginStatus('');
-    
+
     try {
-      console.log('🔑 Пытаюсь войти:', formData.email);
-      
       const user = await login(formData.email, formData.password);
-      
+
       if (user) {
-        console.log('✅ Пользователь вошел успешно:', user.email);
-        setLoginStatus(`✅ Добро пожаловать, ${user.name || 'Пользователь'}!`);
-        
+        setLoginStatus(`Добро пожаловать, ${user.name || 'Пользователь'}!`);
+
         setTimeout(() => {
           if (user.role === 'admin') {
             navigate('/admin');
-          } else if (user.role === 'business') {
-            navigate('/business'); 
           } else {
             navigate('/');
           }
@@ -92,7 +85,6 @@ const Login = () => {
         setError('Ошибка входа');
       }
     } catch (error) {
-      console.error('❌ Ошибка входа:', error);
       setError(error.message || 'Произошла ошибка при входе');
     } finally {
       setLoading(false);
@@ -103,24 +95,27 @@ const Login = () => {
     setCurrentImage(index);
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="login-container">
-      {/* Контейнер формы */}
       <div className="form-container">
         <h1 className="login-title">Войти</h1>
-        
+
         {isCheckingBackend && (
           <p className="server-status">
             Проверяем соединение с сервером...
           </p>
         )}
-        
+
         {!isCheckingBackend && !isBackendAvailable && (
           <p className="server-status error">
-            ❌ Сервер недоступен. Попробуйте позже.
+            Сервер недоступен. Попробуйте позже.
           </p>
         )}
-        
+
         <form onSubmit={handleSubmit} className="login-form">
           <div className="input-group">
             <div className="input-with-label">
@@ -137,23 +132,39 @@ const Login = () => {
               />
             </div>
           </div>
-          
+
           <div className="input-group">
             <div className="input-with-label">
               <span className="field-label">Пароль</span>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Введите ваш пароль"
-                required
-                disabled={loading || !isBackendAvailable}
-                autoComplete="current-password"
-              />
+              <div className="password-input-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Введите ваш пароль"
+                  required
+                  disabled={loading || !isBackendAvailable}
+                  autoComplete="current-password"
+                  className="password-input-with-eye"
+                />
+                <button
+                  type="button"
+                  className="password-toggle-unified"
+                  onClick={togglePasswordVisibility}
+                  disabled={loading || !isBackendAvailable}
+                  aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
+                >
+                  {showPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-          
+
           <div className="form-options">
             <label className="checkbox-label">
               <input
@@ -170,22 +181,21 @@ const Login = () => {
               Забыли пароль?
             </Link>
           </div>
-          
-          {/* Сообщения об ошибках и статусе */}
+
           {error && (
             <div className="error-message">
-              ❌ {error}
+              {error}
             </div>
           )}
-          
+
           {loginStatus && (
             <div className="success-message">
               {loginStatus}
             </div>
           )}
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="login-button"
             disabled={loading || !isBackendAvailable}
           >
@@ -197,7 +207,7 @@ const Login = () => {
             ) : 'Войти'}
           </button>
         </form>
-        
+
         <div className="login-links">
           <p className="signup-link">
             Нет аккаунта? <Link to="/register">Зарегистрируйтесь</Link>
@@ -205,20 +215,18 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Контейнер с фотками */}
       <div className="login-images-container">
         <div className="login-image-slider">
           {images.map((image, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className={`image-slide ${index === currentImage ? 'active' : ''}`}
             >
               <img src={image} alt={`Food ${index + 1}`} />
             </div>
           ))}
         </div>
-        
-        {/* Индикаторы */}
+
         <div className="image-indicators">
           {images.map((_, index) => (
             <div

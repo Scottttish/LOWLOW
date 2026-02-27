@@ -24,7 +24,7 @@
 }
 
 .restaurants-management-title {
-  font-size: 32px;
+  font-size: 26px;
   color: white;
   margin: 0;
   font-weight: 600;
@@ -38,40 +38,27 @@
 }
 
 .restaurants-create-company-btn {
+  padding: 14px 20px;
   background: white;
   color: black;
   border: none;
   border-radius: 12px;
-  padding: 14px 24px;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
   font-size: 14px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
-  letter-spacing: 0.5px;
-  position: relative;
-  overflow: hidden;
-}
-
-.restaurants-create-company-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transition: left 0.5s;
-}
-
-.restaurants-create-company-btn:hover::before {
-  left: 100%;
+  white-space: nowrap;
+  width: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .restaurants-create-company-btn:hover {
-  background: #f8f9fa;
+  background: #f0f0f0;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
 }
 
 .restaurants-search-box {
@@ -84,9 +71,9 @@
   border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   color: white;
-  font-size: 15px;
+  font-size: 14px;
   font-family: 'Poppins', sans-serif;
-  width: 320px;
+  width: 280px;
   transition: all 0.3s ease;
 }
 
@@ -103,15 +90,15 @@
 }
 
 .restaurants-filter-select {
-  padding: 14px 20px;
+  padding: 14px 40px 14px 20px;
   background: rgba(255, 255, 255, 0.08);
   border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   color: white;
-  font-size: 15px;
+  font-size: 14px;
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
-  min-width: 200px;
+  width: 200px;
   transition: all 0.3s ease;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -191,16 +178,40 @@
 }
 
 .restaurants-modal-content {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
+  background: #1A1A1A;
+  /* Opaque background */
   border-radius: 20px;
   padding: 30px;
-  max-width: 600px;
+  max-width: 90vw;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.password-input-wrapper .restaurants-form-input {
+  width: 100%;
+  padding-right: 48px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.3s;
+}
+
+.password-toggle-btn:hover {
+  color: white;
 }
 
 .restaurants-modal-header {
@@ -248,8 +259,53 @@
 
 .restaurants-form-grid {
   display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 30px;
+  align-items: stretch;
+}
+
+.restaurants-form-left-fields {
+  display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 20px;
+}
+
+.logo-upload-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+}
+
+.remove-logo-btn-fixed {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 10px !important;
+  margin: 0 !important;
+  background: rgba(231, 76, 60, 0.2) !important;
+  color: #e74c3c !important;
+  border: 2px solid rgba(231, 76, 60, 0.3) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.remove-logo-btn-fixed:hover {
+  background: rgba(231, 76, 60, 0.3) !important;
+  color: #c0392b !important;
+  transform: translateY(-2px);
+}
+
+.restaurants-modal-right-column {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .restaurants-form-group {
@@ -264,6 +320,10 @@
   margin-bottom: 8px;
   color: white;
   letter-spacing: 0.5px;
+}
+
+.label-not-bold {
+  font-weight: 400 !important;
 }
 
 .restaurants-form-input {
@@ -290,10 +350,17 @@
 
 .restaurants-select-input {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-color: #0F0F0F;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
   background-size: 14px;
+  color: white;
+}
+
+.restaurants-select-input option {
+  background-color: #0F0F0F;
+  color: white;
 }
 
 .restaurants-modal-actions {
@@ -326,7 +393,7 @@
   padding: 12px 24px;
   background: white;
   color: black;
-  border: none;
+  border: 2px solid transparent;
   border-radius: 10px;
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
@@ -374,6 +441,8 @@
   color: rgba(255, 255, 255, 0.9);
   animation: restaurantsFadeInUp 0.6s ease-out both;
   font-family: 'Poppins', sans-serif;
+  text-align: left;
+  vertical-align: middle;
 }
 
 .restaurants-management-table tr:last-child td {
@@ -386,12 +455,47 @@
   transition: all 0.3s ease;
 }
 
+.restaurant-row {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.restaurant-row.row-visible {
+  animation: restaurantsFadeInUp 0.6s ease-out both;
+}
+
 /* Ячейки таблицы */
-.restaurant-id-cell {
-  font-family: 'Courier New', monospace;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 600;
-  font-size: 12px;
+.restaurant-logo-cell {
+  width: 80px;
+}
+
+.restaurant-logo-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  margin: 0 auto;
+  /* Center in cell */
+}
+
+.restaurant-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.restaurant-logo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
 }
 
 .restaurant-info-cell .restaurant-main-info {
@@ -399,85 +503,99 @@
   flex-direction: column;
   gap: 4px;
   margin-bottom: 8px;
+  align-items: flex-start;
 }
 
 .restaurant-info-cell strong {
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 500;
   font-family: 'Poppins', sans-serif;
 }
 
 .restaurant-info-cell span {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
+  font-size: 14px;
   font-family: 'Poppins', sans-serif;
+  font-weight: 500;
 }
 
 .restaurant-director-info {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 12px;
-  font-style: italic;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 500;
   font-family: 'Poppins', sans-serif;
 }
 
 .restaurant-contact-cell div {
   margin-bottom: 4px;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 500;
   font-family: 'Poppins', sans-serif;
 }
 
-/* Бейджи */
+/* Бейджи - Center aligned cells */
+.restaurant-city-cell {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
 .restaurant-city-badge {
   background: rgba(52, 152, 219, 0.25);
   color: #3498db;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: 10px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   border: 1px solid rgba(52, 152, 219, 0.3);
   font-family: 'Poppins', sans-serif;
   letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+.restaurant-hours-cell {
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 
 .restaurant-hours-badge {
   background: rgba(243, 156, 18, 0.25);
   color: #f39c12;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: 10px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   border: 1px solid rgba(243, 156, 18, 0.3);
   font-family: 'Poppins', sans-serif;
   letter-spacing: 0.5px;
+  display: inline-block;
 }
 
 /* Действия - Компактные иконки на одном уровне */
 .restaurant-actions-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 
 .restaurant-actions-wrapper {
-  display: flex;
+  display: inline-flex;
   gap: 8px;
   align-items: center;
+  justify-content: center;
 }
 
 .restaurant-action-btn {
   padding: 8px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   position: relative;
   overflow: hidden;
 }
@@ -489,7 +607,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: left 0.5s;
 }
 
@@ -524,6 +642,25 @@
   color: #c0392b;
 }
 
+/* Center align specific table headers */
+.restaurants-management-table thead th:nth-child(4),
+.restaurants-management-table thead th:nth-child(5),
+.restaurants-management-table thead th:nth-child(6) {
+  text-align: center !important;
+}
+
+.restaurant-logo-upload-input {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 /* Нет данных */
 .restaurants-no-data {
   text-align: center;
@@ -538,11 +675,21 @@
 }
 
 /* Анимации */
+.restaurant-row {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.restaurant-row.row-visible {
+  animation: restaurantsFadeInUp 0.6s ease-out both;
+}
+
 @keyframes restaurantsFadeInUp {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -556,15 +703,15 @@
     align-items: stretch;
     gap: 20px;
   }
-  
+
   .restaurants-management-controls {
     flex-direction: column;
   }
-  
+
   .restaurants-search-input {
     width: 100%;
   }
-  
+
   .restaurants-form-grid {
     grid-template-columns: 1fr;
   }
@@ -574,27 +721,27 @@
   .restaurants-stats-container {
     flex-direction: column;
   }
-  
+
   .restaurants-management-table {
     font-size: 13px;
   }
-  
+
   .restaurants-management-table th,
   .restaurants-management-table td {
     padding: 14px 12px;
   }
-  
+
   .restaurants-modal-content {
     padding: 20px;
     margin: 10px;
   }
-  
+
   .restaurant-action-btn {
     width: 32px;
     height: 32px;
     padding: 6px;
   }
-  
+
   .restaurant-action-btn svg {
     width: 16px;
     height: 16px;
@@ -605,60 +752,60 @@
   .restaurants-stats-container {
     gap: 16px;
   }
-  
+
   .restaurants-stat-card {
     padding: 20px;
   }
-  
+
   .restaurants-stat-number {
     font-size: 32px;
   }
-  
+
   .restaurants-stat-label {
     font-size: 12px;
   }
-  
+
   .restaurants-management-table {
     font-size: 12px;
   }
-  
+
   .restaurants-management-table th,
   .restaurants-management-table td {
     padding: 12px 10px;
   }
-  
+
   .restaurants-modal-actions {
     flex-direction: column;
   }
-  
+
   .restaurants-cancel-btn,
   .restaurants-save-btn {
     width: 100%;
     text-align: center;
   }
-  
+
   .restaurant-actions-wrapper {
     flex-direction: column;
     gap: 4px;
   }
-  
+
   .restaurant-action-btn {
     width: 30px;
     height: 30px;
   }
-  
+
   .restaurant-action-btn svg {
     width: 14px;
     height: 14px;
   }
-  
+
   .restaurants-search-input,
   .restaurants-filter-select,
   .restaurants-form-input {
     padding: 10px 12px;
     font-size: 14px;
   }
-  
+
   .restaurants-create-company-btn {
     padding: 12px 20px;
     font-size: 13px;
@@ -752,20 +899,105 @@
   border-color: rgba(255, 255, 255, 0.25) !important;
 }
 
-/* Стили для disabled состояния */
-.restaurants-form-group select.restaurants-select-input:disabled,
-.restaurants-filter-select:disabled {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: rgba(255, 255, 255, 0.5) !important;
-  cursor: not-allowed;
+.restaurants-logo-section-unified {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  height: 100%;
 }
 
-/* Дополнительные стили для лучшей совместимости */
-@media (max-width: 768px) {
-  .restaurants-form-group select.restaurants-select-input,
-  .restaurants-filter-select {
-    padding: 10px 12px;
-    font-size: 14px;
-  }
+.restaurants-modal-logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.logo-preview-box {
+  width: 180px;
+  height: 180px;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.restaurants-modal-logo-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 15px;
+}
+
+.restaurants-modal-logo-placeholder {
+  font-size: 72px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+}
+
+.logo-upload-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.restaurants-upload-btn-unified {
+  background: white;
+  color: black;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.restaurants-upload-btn-unified:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+}
+
+.remove-logo-btn {
+  background: transparent;
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  color: #ff4d4d;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.remove-logo-btn:hover {
+  background: rgba(231, 76, 60, 0.1);
+  border-color: #ff4d4d;
+}
+
+/* Obsolete sections */
+.restaurants-logo-section-wide,
+.restaurants-modal-avatar-container,
+.avatar-preview-box {
+  display: none !important;
 }

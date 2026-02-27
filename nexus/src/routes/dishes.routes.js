@@ -10,13 +10,12 @@ router.get('/', authMiddleware, async (req, res) => {
     const { restaurant_id } = req.query;
 
     if (!restaurant_id) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'restaurant_id обязателен' 
+      return res.status(400).json({
+        success: false,
+        message: 'restaurant_id обязателен'
       });
     }
 
-    // Простой запрос с базовыми полями
     const dishesQuery = `
       SELECT 
         article,
@@ -24,7 +23,6 @@ router.get('/', authMiddleware, async (req, res) => {
         price,
         quantity,
         composition,
-        category_id,
         image_url,
         image,
         ingredients,
@@ -34,26 +32,25 @@ router.get('/', authMiddleware, async (req, res) => {
       WHERE restaurant_id = $1 AND (status = 'active' OR status IS NULL)
       ORDER BY name
     `;
-    
+
     const dishesResult = await pool.query(dishesQuery, [restaurant_id]);
 
     // Форматируем ответ
     const dishes = dishesResult.rows.map(dish => ({
       ...dish,
-      category: 'Без категории',
       is_active: dish.status === 'active'
     }));
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       dishes: dishes
     });
   } catch (error) {
     console.error('Error getting dishes:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Ошибка сервера',
-      dishes: [] 
+      dishes: []
     });
   }
 });

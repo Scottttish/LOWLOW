@@ -12,7 +12,7 @@ const BusinessAccountLocation = () => {
   const [ymapsLoaded, setYmapsLoaded] = useState(false);
   const [address, setAddress] = useState(user?.address || '');
   const [city, setCity] = useState(user?.city || '');
-  
+
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const placemarkInstance = useRef(null);
@@ -27,7 +27,7 @@ const BusinessAccountLocation = () => {
     const script = document.createElement('script');
     script.src = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
     script.type = 'text/javascript';
-    
+
     script.onload = () => setYmapsLoaded(true);
     script.onerror = () => setYmapsLoaded(false);
 
@@ -65,7 +65,7 @@ const BusinessAccountLocation = () => {
     window.ymaps.ready(() => {
       try {
         const initialCoords = userLocation || [43.238949, 76.889709]; // Алматы по умолчанию
-        
+
         mapInstance.current = new window.ymaps.Map(mapRef.current, {
           center: initialCoords,
           zoom: 12,
@@ -94,7 +94,7 @@ const BusinessAccountLocation = () => {
         });
 
         setMapInitialized(true);
-        
+
         if (userLocation) {
           mapInstance.current.setCenter(userLocation, 15);
         }
@@ -121,22 +121,22 @@ const BusinessAccountLocation = () => {
 
   const getCurrentLocation = () => {
     setIsLoading(true);
-    
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
           const newLocation = [latitude, longitude];
-          
+
           setUserLocation(newLocation);
           setIsSaved(false);
-          
+
           if (placemarkInstance.current && mapInstance.current) {
             placemarkInstance.current.geometry.setCoordinates(newLocation);
             placemarkInstance.current.properties.set('balloonContent', 'Координаты: ' + formatCoordinates(newLocation));
             mapInstance.current.setCenter(newLocation, 15);
           }
-          
+
           // Получаем адрес по координатам
           try {
             if (typeof window.ymaps !== 'undefined') {
@@ -156,7 +156,7 @@ const BusinessAccountLocation = () => {
           } catch (error) {
             console.error('Error getting address:', error);
           }
-          
+
           setIsLoading(false);
         },
         (error) => {
@@ -181,7 +181,7 @@ const BusinessAccountLocation = () => {
           city,
           address
         );
-        
+
         setIsSaved(true);
         alert('Координаты успешно сохранены!');
       } catch (error) {
@@ -208,10 +208,10 @@ const BusinessAccountLocation = () => {
   return (
     <div className="business-account-section">
       <h2 className="section-title">Местоположение компании</h2>
-      
+
       <div className="map-container">
-        <div 
-          ref={mapRef} 
+        <div
+          ref={mapRef}
           className="yandex-map"
           style={{ width: '100%', height: '400px' }}
         >
@@ -222,7 +222,7 @@ const BusinessAccountLocation = () => {
             </div>
           )}
         </div>
-        
+
         <div className="map-controls">
           {!isSaved ? (
             <>
@@ -232,7 +232,7 @@ const BusinessAccountLocation = () => {
                   {userLocation ? formatCoordinates(userLocation) : 'Выберите местоположение на карте'}
                 </div>
               </div>
-              
+
               <div className="address-inputs">
                 <div className="form-group">
                   <label className="form-label">Город</label>
@@ -255,9 +255,9 @@ const BusinessAccountLocation = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="control-buttons">
-                <button 
+                <button
                   className="location-btn"
                   onClick={getCurrentLocation}
                   disabled={isLoading || !mapInitialized}
@@ -271,7 +271,7 @@ const BusinessAccountLocation = () => {
                     'Определить местоположение'
                   )}
                 </button>
-                
+
                 {userLocation && (
                   <button className="save-btn" onClick={saveLocation}>
                     Сохранить координаты

@@ -9,6 +9,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -376,31 +377,31 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .save-button-container {
     flex-direction: column;
   }
-  
+
   .save-btn,
   .cancel-btn {
     width: 100%;
     text-align: center;
   }
-  
+
   .business-avatar-upload {
     width: 100px;
     height: 100px;
   }
-  
+
   .business-avatar-placeholder {
     font-size: 36px;
   }
-  
+
   .working-hours-container {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .time-input-group {
     width: 100%;
   }
@@ -410,18 +411,18 @@
   .section-title {
     font-size: 24px;
   }
-  
+
   .form-input {
     padding: 10px 14px;
     font-size: 14px;
   }
-  
+
   .save-btn,
   .cancel-btn {
     padding: 14px 24px;
     font-size: 14px;
   }
-  
+
   .time-select {
     padding: 6px 10px;
     font-size: 13px;

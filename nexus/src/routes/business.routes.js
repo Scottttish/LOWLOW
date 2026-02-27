@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { pool } = require('../../aboba/index');
 const { authMiddleware } = require('../middleware/auth.middleware');
+const { logAction } = require('../utils/logger');
 
 // Middleware для проверки бизнес-роли
 const businessMiddleware = async (req, res, next) => {
@@ -13,25 +14,25 @@ const businessMiddleware = async (req, res, next) => {
     );
 
     if (!userResult.rows[0]) {
-      return res.status(403).json({ 
-        success: false, 
-        message: 'Пользователь не найден' 
+      return res.status(403).json({
+        success: false,
+        message: 'Пользователь не найден'
       });
     }
 
     const user = userResult.rows[0];
     const userRole = user.role?.toLowerCase();
-    
+
     const isBusiness = userRole === 'business' || userRole === 'buisness';
-    
+
     if (!isBusiness) {
-      return res.status(403).json({ 
-        success: false, 
+      return res.status(403).json({
+        success: false,
         message: 'Доступ разрешен только для бизнес-аккаунтов',
         user_role: user.role
       });
     }
-    
+
     req.user.role = user.role;
     next();
   } catch (error) {
@@ -43,128 +44,122 @@ const businessMiddleware = async (req, res, next) => {
 // ==================== ПРОДУКТЫ БИЗНЕСА ====================
 
 // Получить все продукты бизнеса
+// Получить все продукты бизнеса
 router.get('/products', authMiddleware, businessMiddleware, async (req, res) => {
+  let restaurant;
+
+  // 1. Получаем ресторан (выносим из try-catch продуктов для доступности переменных)
   try {
-    console.log('🔄 Получение продуктов бизнеса для пользователя ID:', req.user.id);
-    
-    // Сначала проверим структуру таблицы dishes
-    const tableInfo = await pool.query(`
-      SELECT column_name 
-      FROM information_schema.columns 
-      WHERE table_name = 'dishes' 
-      ORDER BY ordinal_position
-    `);
-    
-    const columns = tableInfo.rows.map(row => row.column_name);
-    console.log('📊 Колонки таблицы dishes:', columns);
-    
-    // Строим запрос в зависимости от доступных колонок
-    const hasCategory = columns.includes('category');
-    const hasIsActive = columns.includes('is_active');
-    const hasCreatedAt = columns.includes('created_at');
-    const hasUpdatedAt = columns.includes('updated_at');
-    
-    let selectFields = `
-      d.article,
-      d.name,
-      d.price,
-      d.quantity,
-      d.composition,
-      d.category_id,
-      d.image_url,
-      d.image,
-      d.ingredients,
-      d.status,
-      d.restaurant_id
-    `;
-    
-    if (hasCategory) {
-      selectFields += ', d.category';
+    const restaurantResult = await pool.query(
+      'SELECT id, company_name FROM restaurants WHERE user_id = $1',
+      [req.user.id]
+    );
+
+    if (!restaurantResult.rows[0]) {
+      console.log('⚠️ Ресторан не найден для пользователя');
+      return res.json({
+        success: true,
+        products: [],
+        restaurant_found: false,
+        message: 'У вашего аккаунта нет ресторана. Создайте ресторан сначала.'
+      });
     }
-    
-    if (hasIsActive) {
-      selectFields += ', d.is_active';
-    }
-    
-    if (hasCreatedAt) {
-      selectFields += ', d.created_at';
-    }
-    
-    if (hasUpdatedAt) {
-      selectFields += ', d.updated_at';
-    }
-    
+
+    restaurant = restaurantResult.rows[0];
+    console.log(`✅ Ресторан: ${restaurant.company_name} (ID: ${restaurant.id})`);
+
+  } catch (error) {
+    console.error('❌ Ошибка получения ресторана:', error);
+    return res.status(500).json({ success: false, message: 'Ошибка сервера при поиске ресторана' });
+  }
+
+  // 2. Получаем продукты
+  try {
+    // ВАЖНО: Используем d.category, а НЕ d.category_id
+    // ВАЖНО: Никаких проверок information_schema. Просто пробуем взять поля.
     const query = `
-      SELECT ${selectFields}
+      SELECT 
+        d.article,
+        d.name,
+        d.price,
+        d.quantity,
+        d.composition,
+        d.category, 
+        d.image_url,
+        d.image,
+        d.ingredients,
+        d.status,
+        d.restaurant_id,
+        d.is_active,
+        d.created_at,
+        d.updated_at
       FROM dishes d
       WHERE d.restaurant_id = $1
-      ORDER BY ${hasUpdatedAt ? 'd.updated_at DESC' : 'd.article DESC'}
+      ORDER BY d.created_at DESC
     `;
-    
-    console.log('📝 SQL запрос:', query);
-    
-    const productsResult = await pool.query(query, [req.user.id]);
 
-    console.log(`✅ Найдено ${productsResult.rows.length} продуктов`);
-    
-    // Форматируем ответ, добавляя недостающие поля
-    const products = productsResult.rows.map(product => ({
-      ...product,
-      category: product.category || (product.category_id ? `Категория ${product.category_id}` : 'Без категории'),
-      is_active: product.is_active !== undefined ? product.is_active : (product.status === 'active'),
-      created_at: product.created_at || new Date().toISOString(),
-      updated_at: product.updated_at || new Date().toISOString()
-    }));
+    console.log('📝 Выполняем SQL запрос продуктов (Hardcoded)...');
+    const productsResult = await pool.query(query, [restaurant.id]);
+    console.log(`✅ Найдено продуктов: ${productsResult.rows.length}`);
 
-    res.json({ 
-      success: true, 
+    // Форматируем данные
+    const products = productsResult.rows.map(product => {
+      // Логика совместимости полей
+      const isActive = product.is_active !== undefined ? product.is_active : (product.status === 'active');
+      const imageUrl = product.image_url || product.image || '';
+
+      return {
+        ...product,
+        is_active: isActive,
+        image_url: imageUrl,
+        category: product.category || 'Без категории',
+        quantity: product.quantity || 0,
+        price: product.price || 0,
+        name: product.name || 'Без названия'
+      };
+    });
+
+    res.json({
+      success: true,
       products: products
     });
+
   } catch (error) {
-    console.error('❌ Ошибка получения продуктов бизнеса:', error);
-    
-    // Попробуем получить продукты без лишних полей
-    try {
-      const simpleQuery = `
-        SELECT 
-          article,
-          name,
-          price,
-          quantity,
-          composition,
-          category_id,
-          image_url,
-          image,
-          ingredients,
-          status,
-          restaurant_id
-        FROM dishes 
-        WHERE restaurant_id = $1
-        ORDER BY article DESC
-      `;
-      
-      const productsResult = await pool.query(simpleQuery, [req.user.id]);
-      
-      const products = productsResult.rows.map(product => ({
-        ...product,
-        category: 'Без категории',
-        is_active: product.status === 'active',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }));
-      
-      res.json({ 
-        success: true, 
-        products: products
-      });
-    } catch (fallbackError) {
-      console.error('❌ Ошибка в fallback запросе:', fallbackError);
-      res.status(500).json({ 
-        success: false, 
-        message: 'Ошибка получения продуктов',
-        error: error.message
-      });
+    console.error('❌ Ошибка SQL (GET /products):', error.message);
+
+    // Fallback: Пробуем самый простой запрос, если основной упал (например, нет поля is_active)
+    if (restaurant) {
+      try {
+        console.log('🔄 Fallback: Пробуем упрощенный запрос...');
+        // Берем только гарантированные поля
+        const simpleResult = await pool.query(
+          `SELECT article, name, price, quantity, category, status, image_url, image 
+                 FROM dishes WHERE restaurant_id = $1`,
+          [restaurant.id]
+        );
+
+        const simpleProducts = simpleResult.rows.map(p => ({
+          ...p,
+          is_active: p.status === 'active',
+          image_url: p.image_url || p.image || '',
+          created_at: new Date().toISOString() // Заглушка
+        }));
+
+        return res.json({
+          success: true,
+          products: simpleProducts,
+          message: 'Показаны основные данные (режим совместимости)'
+        });
+      } catch (fbError) {
+        console.error('❌ Fallback тоже упал:', fbError.message);
+      }
     }
+
+    res.status(500).json({
+      success: false,
+      message: 'Ошибка при загрузке продуктов. Проверьте логи сервера.',
+      error: error.message
+    });
   }
 });
 
@@ -174,7 +169,6 @@ router.post('/products', authMiddleware, businessMiddleware, async (req, res) =>
     const {
       name,
       price,
-      category,
       ingredients,
       composition,
       quantity,
@@ -186,8 +180,7 @@ router.post('/products', authMiddleware, businessMiddleware, async (req, res) =>
     console.log('🔄 Добавление нового продукта:', {
       name,
       price,
-      category,
-      restaurant_id: req.user.id
+      user_id: req.user.id
     });
 
     if (!name || !price) {
@@ -197,30 +190,46 @@ router.post('/products', authMiddleware, businessMiddleware, async (req, res) =>
       });
     }
 
+    // Получаем ресторан бизнес-аккаунта
+    const restaurantResult = await pool.query(
+      'SELECT id, company_name FROM restaurants WHERE user_id = $1',
+      [req.user.id]
+    );
+
+    if (!restaurantResult.rows[0]) {
+      return res.status(400).json({
+        success: false,
+        message: 'У вашего аккаунта нет ресторана. Создайте ресторан сначала.'
+      });
+    }
+
+    const restaurant = restaurantResult.rows[0];
+    console.log(`✅ Ресторан найден: ${restaurant.company_name} (ID: ${restaurant.id})`);
+
     // Генерируем уникальный article
     const article = `PROD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    
+
     // Определяем статус на основе is_active
     const status = 'active'; // По умолчанию активный
-    
+
     // Проверим структуру таблицы
     const tableInfo = await pool.query(`
       SELECT column_name 
       FROM information_schema.columns 
       WHERE table_name = 'dishes'
     `);
-    
+
     const columns = tableInfo.rows.map(row => row.column_name);
     const hasCategory = columns.includes('category');
     const hasIsActive = columns.includes('is_active');
     const hasCreatedAt = columns.includes('created_at');
     const hasUpdatedAt = columns.includes('updated_at');
-    
+
     // Строим запрос в зависимости от доступных колонок
     let insertFields = 'article, name, price, quantity, composition, image_url, image, ingredients, status, restaurant_id';
     let insertValues = '$1, $2, $3, $4, $5, $6, $7, $8, $9, $10';
     let returnFields = 'article, name, price, quantity, composition, image_url, image, ingredients, status, restaurant_id';
-    
+
     const params = [
       article,
       name,
@@ -231,19 +240,11 @@ router.post('/products', authMiddleware, businessMiddleware, async (req, res) =>
       image_url || image || '',
       ingredients || '',
       status,
-      req.user.id
+      restaurant.id
     ];
-    
+
     let paramIndex = 11;
-    
-    if (hasCategory) {
-      insertFields += ', category';
-      insertValues += `, $${paramIndex}`;
-      returnFields += ', category';
-      params.push(category || 'Без категории');
-      paramIndex++;
-    }
-    
+
     if (hasIsActive) {
       insertFields += ', is_active';
       insertValues += `, $${paramIndex}`;
@@ -251,49 +252,57 @@ router.post('/products', authMiddleware, businessMiddleware, async (req, res) =>
       params.push(is_active !== undefined ? is_active : true);
       paramIndex++;
     }
-    
+
     if (hasCreatedAt) {
       insertFields += ', created_at';
       insertValues += ', NOW()';
       returnFields += ', created_at';
     }
-    
+
     if (hasUpdatedAt) {
       insertFields += ', updated_at';
       insertValues += ', NOW()';
       returnFields += ', updated_at';
     }
-    
+
     const query = `
       INSERT INTO dishes (${insertFields})
       VALUES (${insertValues})
       RETURNING ${returnFields}
     `;
-    
+
     console.log('📝 SQL запрос добавления:', query);
-    
+
     const result = await pool.query(query, params);
 
     console.log('✅ Продукт успешно добавлен');
 
     const product = result.rows[0];
-    
+
     // Добавляем недостающие поля в ответ
     if (!product.category && category) {
       product.category = category;
     }
-    
+
     if (product.is_active === undefined) {
       product.is_active = true;
     }
-    
+
     if (!product.created_at) {
       product.created_at = new Date().toISOString();
     }
-    
+
     if (!product.updated_at) {
       product.updated_at = new Date().toISOString();
     }
+
+    // LOGGING
+    await logAction(
+      req.user.id,
+      'CREATE_PRODUCT',
+      `Бизнес-пользователь ${restaurant.company_name} создал продукт ${product.name}`,
+      { product }
+    );
 
     res.json({
       success: true,
@@ -317,7 +326,6 @@ router.put('/products/:article', authMiddleware, businessMiddleware, async (req,
     const {
       name,
       price,
-      category,
       ingredients,
       composition,
       quantity,
@@ -343,22 +351,22 @@ router.put('/products/:article', authMiddleware, businessMiddleware, async (req,
 
     // УБИРАЕМ ПРОВЕРКУ ВЛАДЕНИЯ! Если продукт отображается в интерфейсе, 
     // он уже принадлежит ресторану текущего бизнес-аккаунта
-    
+
     // Проверим структуру таблицы
     const tableInfo = await pool.query(`
       SELECT column_name 
       FROM information_schema.columns 
       WHERE table_name = 'dishes'
     `);
-    
+
     const columns = tableInfo.rows.map(row => row.column_name);
     const hasCategory = columns.includes('category');
     const hasIsActive = columns.includes('is_active');
     const hasUpdatedAt = columns.includes('updated_at');
-    
+
     // Определяем статус на основе is_active
     const status = is_active !== undefined ? (is_active ? 'active' : 'inactive') : 'active';
-    
+
     // Строим запрос обновления
     let updateFields = `
       name = COALESCE($1, name),
@@ -370,9 +378,9 @@ router.put('/products/:article', authMiddleware, businessMiddleware, async (req,
       image = COALESCE($7, image),
       status = $8
     `;
-    
+
     let returnFields = 'article, name, price, quantity, composition, image_url, image, ingredients, status, restaurant_id';
-    
+
     const params = [
       name,
       price ? parseFloat(price) : undefined,
@@ -383,40 +391,33 @@ router.put('/products/:article', authMiddleware, businessMiddleware, async (req,
       image_url || image,
       status
     ];
-    
+
     let paramIndex = 9;
-    
-    if (hasCategory && category !== undefined) {
-      updateFields += `, category = $${paramIndex}`;
-      returnFields += ', category';
-      params.push(category);
-      paramIndex++;
-    }
-    
+
     if (hasIsActive && is_active !== undefined) {
       updateFields += `, is_active = $${paramIndex}`;
       returnFields += ', is_active';
       params.push(is_active);
       paramIndex++;
     }
-    
+
     if (hasUpdatedAt) {
       updateFields += ', updated_at = NOW()';
       returnFields += ', updated_at';
     }
-    
+
     // Добавляем article в параметры (УБИРАЕМ restaurant_id из условий WHERE)
     params.push(article);
-    
+
     const query = `
       UPDATE dishes 
       SET ${updateFields}
       WHERE article = $${paramIndex}
       RETURNING ${returnFields}
     `;
-    
+
     console.log('📝 SQL запрос обновления:', query);
-    
+
     const result = await pool.query(query, params);
 
     if (result.rows.length === 0) {
@@ -429,19 +430,23 @@ router.put('/products/:article', authMiddleware, businessMiddleware, async (req,
     console.log('✅ Продукт успешно обновлен');
 
     const product = result.rows[0];
-    
+
     // Добавляем недостающие поля в ответ
-    if (!product.category && category) {
-      product.category = category;
-    }
-    
     if (product.is_active === undefined) {
       product.is_active = is_active !== undefined ? is_active : true;
     }
-    
+
     if (!product.updated_at) {
       product.updated_at = new Date().toISOString();
     }
+
+    // LOGGING
+    await logAction(
+      req.user.id,
+      'UPDATE_PRODUCT',
+      `Бизнес-пользователь обновил продукт ${product.name} (Артикул: ${article})`,
+      { previous: existingProduct.rows[0], current: product, article }
+    );
 
     res.json({
       success: true,
@@ -496,6 +501,14 @@ router.delete('/products/:article', authMiddleware, businessMiddleware, async (r
 
     console.log('✅ Продукт успешно удален:', article);
 
+    // LOGGING
+    await logAction(
+      req.user.id,
+      'DELETE_PRODUCT',
+      `Бизнес-пользователь удалил продукт (Артикул: ${article})`,
+      { article, deletedProduct: existingProduct.rows[0] }
+    );
+
     res.json({
       success: true,
       message: 'Продукт успешно удален'
@@ -514,7 +527,30 @@ router.delete('/products/:article', authMiddleware, businessMiddleware, async (r
 router.get('/products-stats', authMiddleware, businessMiddleware, async (req, res) => {
   try {
     console.log('📊 Получение статистики продуктов для бизнеса ID:', req.user.id);
-    
+
+    // Получаем ресторан бизнес-аккаунта
+    const restaurantResult = await pool.query(
+      'SELECT id, company_name FROM restaurants WHERE user_id = $1',
+      [req.user.id]
+    );
+
+    if (!restaurantResult.rows[0]) {
+      console.log('⚠️ У бизнес-аккаунта нет ресторана');
+      return res.json({
+        success: true,
+        stats: {
+          total_products: 0,
+          active_products: 0,
+          inactive_products: 0
+        },
+        restaurant_found: false,
+        message: 'У вашего аккаунта нет ресторана'
+      });
+    }
+
+    const restaurant = restaurantResult.rows[0];
+    console.log(`✅ Ресторан найден: ${restaurant.company_name} (ID: ${restaurant.id})`);
+
     // Проверяем существование поля is_active
     const tableInfo = await pool.query(`
       SELECT column_name 
@@ -523,7 +559,7 @@ router.get('/products-stats', authMiddleware, businessMiddleware, async (req, re
     `);
 
     let statsQuery;
-    
+
     if (tableInfo.rows.length > 0) {
       // Если есть поле is_active
       statsQuery = `
@@ -545,22 +581,22 @@ router.get('/products-stats', authMiddleware, businessMiddleware, async (req, re
         WHERE restaurant_id = $1
       `;
     }
-    
-    const statsResult = await pool.query(statsQuery, [req.user.id]);
-    
+
+    const statsResult = await pool.query(statsQuery, [restaurant.id]);
+
     const stats = {
       total_products: parseInt(statsResult.rows[0]?.total_products || 0),
       active_products: parseInt(statsResult.rows[0]?.active_products || 0),
       inactive_products: parseInt(statsResult.rows[0]?.inactive_products || 0)
     };
-    
+
     console.log('📊 Статистика продуктов:', stats);
-    
+
     res.json({
       success: true,
       stats: stats
     });
-    
+
   } catch (error) {
     console.error('❌ Ошибка получения статистики продуктов:', error);
     res.status(500).json({
@@ -577,7 +613,7 @@ router.get('/products-stats', authMiddleware, businessMiddleware, async (req, re
 router.get('/orders', authMiddleware, businessMiddleware, async (req, res) => {
   try {
     console.log('🔄 Получение заказов бизнеса для пользователя ID:', req.user.id);
-    
+
     // Проверяем, есть ли ресторан у этого бизнес-аккаунта
     const restaurantResult = await pool.query(
       'SELECT id, company_name FROM restaurants WHERE user_id = $1',
@@ -586,8 +622,8 @@ router.get('/orders', authMiddleware, businessMiddleware, async (req, res) => {
 
     if (!restaurantResult.rows[0]) {
       console.log('⚠️ У бизнес-аккаунта нет ресторана');
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         orders: [],
         restaurant_found: false,
         message: 'У вашего аккаунта нет ресторана'
@@ -623,13 +659,13 @@ router.get('/orders', authMiddleware, businessMiddleware, async (req, res) => {
       WHERE o.restaurant_id = $1
       ORDER BY o.created_at DESC
     `;
-    
+
     const ordersResult = await pool.query(ordersQuery, [restaurant.id]);
-    
+
     console.log(`✅ Найдено ${ordersResult.rows.length} заказов для ресторана`);
 
     const orders = ordersResult.rows;
-    
+
     // Для каждого заказа получаем его элементы
     for (let order of orders) {
       const itemsResult = await pool.query(
@@ -648,7 +684,7 @@ router.get('/orders', authMiddleware, businessMiddleware, async (req, res) => {
          WHERE order_id = $1`,
         [order.id]
       );
-      
+
       order.items = itemsResult.rows;
     }
 
@@ -711,14 +747,14 @@ router.put('/orders/:orderId/status', authMiddleware, businessMiddleware, async 
     // Обновляем статус заказа
     const updateFields = ['status = $1'];
     const params = [status];
-    
+
     // Если статус "completed" или "delivered", добавляем время завершения
     if (status === 'completed' || status === 'delivered') {
       updateFields.push('completed_at = CURRENT_TIMESTAMP');
     }
-    
+
     updateFields.push('updated_at = CURRENT_TIMESTAMP');
-    
+
     const query = `
       UPDATE orders 
       SET ${updateFields.join(', ')}
@@ -727,9 +763,9 @@ router.put('/orders/:orderId/status', authMiddleware, businessMiddleware, async 
         id, order_number, status, updated_at,
         CASE WHEN completed_at IS NOT NULL THEN completed_at END as completed_at
     `;
-    
+
     params.push(orderId);
-    
+
     const result = await pool.query(query, params);
 
     console.log(`✅ Статус заказа ${orderId} обновлен на ${status}`);
@@ -762,16 +798,24 @@ router.put('/orders/:orderId/status', authMiddleware, businessMiddleware, async 
     );
 
     const order = updatedOrder.rows[0];
-    
+
     if (order) {
       // Получаем элементы заказа
       const itemsResult = await pool.query(
         `SELECT * FROM order_items WHERE order_id = $1`,
         [orderId]
       );
-      
+
       order.items = itemsResult.rows;
     }
+
+    // LOGGING
+    await logAction(
+      req.user.id,
+      'UPDATE_ORDER_STATUS',
+      `Статус заказа ${order.order_number} изменен: ${orderCheck.rows[0].status} -> ${status}`,
+      { orderId, oldStatus: orderCheck.rows[0].status, newStatus: status, orderNumber: order.order_number }
+    );
 
     res.json({
       success: true,
@@ -792,7 +836,7 @@ router.put('/orders/:orderId/status', authMiddleware, businessMiddleware, async 
 router.get('/orders/stats', authMiddleware, businessMiddleware, async (req, res) => {
   try {
     console.log('📊 Получение статистики заказов бизнеса для пользователя ID:', req.user.id);
-    
+
     // Проверяем, есть ли ресторан у этого бизнес-аккаунта
     const restaurantResult = await pool.query(
       'SELECT id FROM restaurants WHERE user_id = $1',
@@ -814,7 +858,7 @@ router.get('/orders/stats', authMiddleware, businessMiddleware, async (req, res)
     }
 
     const restaurantId = restaurantResult.rows[0].id;
-    
+
     const statsResult = await pool.query(
       `SELECT 
         COUNT(*) as total_orders,
@@ -860,14 +904,14 @@ router.get('/restaurant', authMiddleware, businessMiddleware, async (req, res) =
     );
 
     if (!restaurantResult.rows[0]) {
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         restaurant: null,
         message: 'Ресторан не найден'
       });
     }
 
-    res.json({ 
+    res.json({
       success: true,
       restaurant: restaurantResult.rows[0]
     });
@@ -905,7 +949,7 @@ router.put('/restaurant', authMiddleware, businessMiddleware, async (req, res) =
     );
 
     let result;
-    
+
     if (existingRestaurant.rows[0]) {
       // Обновляем существующий ресторан
       result = await pool.query(

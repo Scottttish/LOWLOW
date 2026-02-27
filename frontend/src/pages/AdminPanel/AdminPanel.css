@@ -42,11 +42,19 @@
   opacity: 0.7;
 }
 
+.admin-header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
 .admin-subtitle {
   font-size: 16px;
   color: rgba(255, 255, 255, 0.7);
-  margin: 8px 0 0 0;
+  margin: 0;
   font-weight: 300;
+  line-height: 1.2;
 }
 
 /* Уведомления и пользователь */
@@ -134,6 +142,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -280,12 +289,28 @@
   line-height: 1.6;
 }
 
+.admin-panel-header-content h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.admin-panel-header-content p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  margin-top: 4px;
+}
+
 /* Анимации появления */
 @keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -303,25 +328,25 @@
   .admin-content-wrapper {
     padding: 30px 24px;
   }
-  
+
   .admin-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
   }
-  
+
   .admin-title {
     font-size: 24px;
   }
-  
+
   .admin-tabs {
     flex-direction: column;
   }
-  
+
   .tab-button {
     padding: 12px 16px;
   }
-  
+
   .admin-main-content {
     padding: 20px;
   }
@@ -331,11 +356,11 @@
   .admin-title {
     font-size: 20px;
   }
-  
+
   .admin-subtitle {
     font-size: 14px;
   }
-  
+
   .admin-user-info {
     padding: 10px 12px;
     font-size: 12px;

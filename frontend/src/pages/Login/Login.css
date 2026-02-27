@@ -142,13 +142,13 @@ body {
   background: rgba(255, 255, 255, 0.05);
 }
 
-.checkbox-label input:checked + .checkmark {
+.checkbox-label input:checked+.checkmark {
   background: #ffffff;
   border-color: #ffffff;
   transform: scale(1.05);
 }
 
-.checkbox-label input:checked + .checkmark::after {
+.checkbox-label input:checked+.checkmark::after {
   content: '✓';
   position: absolute;
   top: 50%;
@@ -202,7 +202,7 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   transition: left 0.6s;
 }
 
@@ -277,7 +277,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(0,0,0,0.1) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, transparent 50%, rgba(0, 0, 0, 0.1) 100%);
   z-index: 1;
 }
 
@@ -346,15 +346,39 @@ body {
 
 /* Анимация смены фоток */
 @keyframes slideAnimation {
-  0%, 18% { opacity: 1; transform: scale(1); }
-  20%, 100% { opacity: 0; transform: scale(1.1); }
+
+  0%,
+  18% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  20%,
+  100% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
 }
 
-.image-slide:nth-child(1) { animation: slideAnimation 30s infinite; }
-.image-slide:nth-child(2) { animation: slideAnimation 30s infinite 6s; }
-.image-slide:nth-child(3) { animation: slideAnimation 30s infinite 12s; }
-.image-slide:nth-child(4) { animation: slideAnimation 30s infinite 18s; }
-.image-slide:nth-child(5) { animation: slideAnimation 30s infinite 24s; }
+.image-slide:nth-child(1) {
+  animation: slideAnimation 30s infinite;
+}
+
+.image-slide:nth-child(2) {
+  animation: slideAnimation 30s infinite 6s;
+}
+
+.image-slide:nth-child(3) {
+  animation: slideAnimation 30s infinite 12s;
+}
+
+.image-slide:nth-child(4) {
+  animation: slideAnimation 30s infinite 18s;
+}
+
+.image-slide:nth-child(5) {
+  animation: slideAnimation 30s infinite 24s;
+}
 
 /* Интенсивное свечение */
 .login-images-container {
@@ -363,7 +387,7 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 24px;
-  box-shadow: 
+  box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.1),
     0 0 40px rgba(255, 255, 255, 0.1),
     0 0 80px rgba(255, 255, 255, 0.05);
@@ -377,17 +401,13 @@ body {
   left: -15px;
   right: -15px;
   bottom: -15px;
-  background: 
-    radial-gradient(
-      circle at 30% 30%,
+  background:
+    radial-gradient(circle at 30% 30%,
       rgba(255, 255, 255, 0.15) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 70% 70%,
+      transparent 50%),
+    radial-gradient(circle at 70% 70%,
       rgba(255, 255, 255, 0.1) 0%,
-      transparent 50%
-    );
+      transparent 50%);
   border-radius: 32px;
   z-index: -1;
   filter: blur(25px);
@@ -402,14 +422,12 @@ body {
   left: -8px;
   right: -8px;
   bottom: -8px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.05) 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.05) 75%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 0.1) 100%);
   border-radius: 28px;
   z-index: -1;
   filter: blur(12px);
@@ -420,6 +438,7 @@ body {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -432,19 +451,19 @@ body {
     padding: 40px 20px;
     gap: 40px;
   }
-  
+
   .form-container {
     width: 100%;
     max-width: 400px;
     padding: 0;
   }
-  
+
   .login-images-container {
     width: 100%;
     max-width: 500px;
     height: 500px;
   }
-  
+
   .login-title {
     font-size: 2rem;
   }
@@ -509,6 +528,17 @@ body {
   animation: slideDown 0.3s ease;
 }
 
+/* Password wrapper overrides - ensures the toggle button is always far right */
+.input-with-label .password-input-wrapper {
+  position: relative !important;
+}
+
+.input-with-label .password-input-wrapper input {
+  padding-right: 48px !important;
+}
+
+/* Standardized password toggle used through index.css */
+
 .success-message {
   background: rgba(76, 217, 100, 0.1);
   border: 1px solid rgba(76, 217, 100, 0.3);
@@ -525,6 +555,7 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -544,7 +575,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Отладочная информация */
@@ -606,7 +639,7 @@ body {
   .test-buttons {
     grid-template-columns: 1fr;
   }
-  
+
   .test-button {
     padding: 12px;
     font-size: 0.9rem;
@@ -759,6 +792,7 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -778,7 +812,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Ссылки внизу формы */
@@ -876,7 +912,7 @@ body {
   .existing-users-section {
     padding: 15px;
   }
-  
+
   .existing-user-item {
     padding: 10px;
   }
@@ -902,3 +938,4 @@ body {
   transform: none !important;
   box-shadow: none !important;
 }
+

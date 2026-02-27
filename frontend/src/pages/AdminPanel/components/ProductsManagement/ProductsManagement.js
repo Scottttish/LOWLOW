@@ -1,17 +1,20 @@
-// src/pages/AdminPanel/components/ProductsManagement/ProductsManagement.js
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../../../context/AuthContext';
 import './ProductsManagement.css';
 
 const ProductsManagement = () => {
-  const { getAllProducts, users } = useAuth();
+  const { getAllProducts, adminUpdateProduct, adminDeleteProduct, adminCreateProduct, getAllUsers } = useAuth();
   const [products, setProducts] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterCompany, setFilterCompany] = useState('all');
   const [isVisible, setIsVisible] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({});
+  const [customCategory, setCustomCategory] = useState('');
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -39,21 +42,84 @@ const ProductsManagement = () => {
 
   useEffect(() => {
     loadProducts();
+    loadRestaurants();
+
+    // Real-time refresh every 15 seconds
+    const interval = setInterval(() => {
+      loadProducts();
+      // No need to poll restaurants as often, but let's keep it simple
+    }, 15000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const loadProducts = () => {
-    const allProducts = getAllProducts();
-    setProducts(allProducts);
+  const loadRestaurants = async () => {
+    try {
+      const allUsers = await getAllUsers();
+      if (allUsers) {
+        const businessUsers = allUsers.filter(u => u.role === 'business' || u.role === 'buisness');
+        setRestaurants(businessUsers);
+      }
+    } catch (error) {
+      console.error('Error loading restaurants:', error);
+    }
   };
 
-  const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
-  const companies = [...new Set(products.map(p => p.companyName).filter(Boolean))];
+  const loadProducts = async () => {
+    try {
+      console.log('🔍 AdminPanel: Fetching products from admin API...');
+      const allProducts = await getAllProducts();
+      console.log('✅ AdminPanel: Products received:', {
+        count: allProducts?.length || 0,
+        products: allProducts
+      });
+
+      if (!allProducts || allProducts.length === 0) {
+        console.warn('⚠️ AdminPanel: No products found in database');
+      }
+
+      setProducts(allProducts || []);
+    } catch (error) {
+      console.error('❌ AdminPanel: Failed to load products:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack
+      });
+      setProducts([]);
+      // Show user-friendly error
+      alert(`Ошибка загрузки продуктов: ${error.message}\n\nПожалуйста, проверьте:\n1. Запущен ли backend сервер\n2. Есть ли продукты в таблице dishes\n3. Консоль браузера для деталей (F12)`);
+    }
+  };
+
+  const productCategories = [
+    "Бургеры",
+    "Роллы",
+    "Пицца",
+    "Суши",
+    "Основные блюда",
+    "Закуски",
+    "Салаты",
+    "Супы",
+    "Десерты",
+    "Напитки",
+    "Гарниры",
+    "Другое..."
+  ];
+
+  const categories = [...new Set([...productCategories, ...products.map(p => p.category).filter(Boolean)])];
+  // Support both snake_case (backend) and camelCase (frontend legacy) for company name
+  const companies = [...new Set(products.map(p => p.company_name || p.companyName).filter(Boolean))];
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.ingredients?.toLowerCase().includes(searchTerm.toLowerCase());
+    const productName = product.name || '';
+    const matchesSearch = productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.ingredients && product.ingredients.toLowerCase().includes(searchTerm.toLowerCase()));
+
     const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
-    const matchesCompany = filterCompany === 'all' || product.companyName === filterCompany;
+
+    const prodCompanyName = product.company_name || product.companyName;
+    const matchesCompany = filterCompany === 'all' || prodCompanyName === filterCompany;
+
     return matchesSearch && matchesCategory && matchesCompany;
   });
 
@@ -70,53 +136,53 @@ const ProductsManagement = () => {
   };
 
   const handleSaveEdit = async () => {
-    if (!editFormData.name || !editFormData.price || !editFormData.category) {
-      alert('Название, цена и категория обязательны для заполнения');
-      return;
-    }
-
     try {
-      // Получаем текущие продукты компании
-      const companyProducts = JSON.parse(localStorage.getItem(`products_${editingProduct.companyId}`)) || [];
-      
-      // Обновляем продукт
-      const updatedProducts = companyProducts.map(product => 
-        product.id === editingProduct.id 
-          ? { 
-              ...product, 
-              ...editFormData,
-              price: parseInt(editFormData.price),
-              quantity: editFormData.quantity ? parseInt(editFormData.quantity) : 0
-            } 
-          : product
-      );
-      
-      // Сохраняем обновленные продукты
-      localStorage.setItem(`products_${editingProduct.companyId}`, JSON.stringify(updatedProducts));
-      
-      // Обновляем состояние
-      setProducts(prev => prev.map(product => 
-        product.id === editingProduct.id 
-          ? { 
-              ...product, 
-              ...editFormData,
-              price: parseInt(editFormData.price),
-              quantity: editFormData.quantity ? parseInt(editFormData.quantity) : 0
-            } 
-          : product
-      ));
-      
-      setEditingProduct(null);
+      const productData = {
+        ...editFormData,
+        price: parseFloat(editFormData.price),
+        quantity: editFormData.quantity ? parseInt(editFormData.quantity) : 0,
+        restaurant_id: editFormData.restaurant_id,
+        category: editFormData.category === 'Другое...' ? customCategory : editFormData.category
+      };
+
+      if (isCreateModalOpen) {
+        if (!productData.restaurant_id) {
+          // Fallback to first restaurant if not selected
+          productData.restaurant_id = restaurants[0]?.id;
+        }
+        await adminCreateProduct(productData);
+        setIsCreateModalOpen(false);
+      } else {
+        await adminUpdateProduct(editingProduct.article, productData);
+        setEditingProduct(null);
+      }
+
+      // Refresh data
+      loadProducts();
       setEditFormData({});
-      alert('Продукт успешно обновлен!');
+      setCustomCategory('');
     } catch (error) {
-      console.error('Ошибка при сохранении изменений:', error);
-      alert('Ошибка при сохранении изменений');
+      console.error('Ошибка при сохранении:', error);
     }
+  };
+
+  const handleCreateProduct = () => {
+    setIsCreateModalOpen(true);
+    setEditFormData({
+      name: '',
+      price: '',
+      category: productCategories[0],
+      ingredients: '',
+      quantity: '',
+      status: 'active',
+      restaurant_id: restaurants[0]?.id || ''
+    });
+    setCustomCategory('');
   };
 
   const handleCancelEdit = () => {
     setEditingProduct(null);
+    setIsCreateModalOpen(false);
     setEditFormData({});
   };
 
@@ -128,20 +194,13 @@ const ProductsManagement = () => {
     }));
   };
 
-  const handleDeleteProduct = (productId, companyId) => {
+  const handleDeleteProduct = async (productArticle) => {
     if (window.confirm('Вы уверены, что хотите удалить этот продукт?')) {
       try {
-        // Удаляем продукт из localStorage компании
-        const companyProducts = JSON.parse(localStorage.getItem(`products_${companyId}`)) || [];
-        const updatedProducts = companyProducts.filter(product => product.id !== productId);
-        localStorage.setItem(`products_${companyId}`, JSON.stringify(updatedProducts));
-        
-        // Обновляем состояние
-        setProducts(prev => prev.filter(product => product.id !== productId));
-        alert('Продукт успешно удален!');
+        await adminDeleteProduct(productArticle);
+        setProducts(prev => prev.filter(product => product.article !== productArticle));
       } catch (error) {
         console.error('Ошибка при удалении продукта:', error);
-        alert('Ошибка при удалении продукта');
       }
     }
   };
@@ -153,7 +212,7 @@ const ProductsManagement = () => {
   return (
     <div className="products-management-panel" ref={sectionRef}>
       <div className={`products-management-content ${isVisible ? 'products-content-visible' : ''}`}>
-        
+
         {/* Заголовок и управление */}
         <div className="products-management-header">
           <h2 className="products-management-title">Управление продуктами</h2>
@@ -167,18 +226,8 @@ const ProductsManagement = () => {
                 className="products-search-input"
               />
             </div>
-            <select 
-              value={filterCategory} 
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="products-filter-select"
-            >
-              <option value="all">Все категории</option>
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-            <select 
-              value={filterCompany} 
+            <select
+              value={filterCompany}
               onChange={(e) => setFilterCompany(e.target.value)}
               className="products-filter-select"
             >
@@ -187,6 +236,9 @@ const ProductsManagement = () => {
                 <option key={company} value={company}>{company}</option>
               ))}
             </select>
+            <button className="products-create-btn" onClick={handleCreateProduct}>
+              + Создать продукт
+            </button>
           </div>
         </div>
 
@@ -212,15 +264,14 @@ const ProductsManagement = () => {
           </div>
         </div>
 
-        {/* Модальное окно редактирования */}
-        {editingProduct && (
+        {(editingProduct || isCreateModalOpen) && createPortal(
           <div className="products-modal-overlay">
             <div className="products-modal-content">
               <div className="products-modal-header">
-                <h3>Редактирование продукта</h3>
+                <h3>{isCreateModalOpen ? 'Создание продукта' : 'Редактирование продукта'}</h3>
                 <button className="products-modal-close" onClick={handleCancelEdit}>×</button>
               </div>
-              
+
               <div className="products-modal-body">
                 <div className="products-form-grid">
                   <div className="products-form-group">
@@ -234,7 +285,7 @@ const ProductsManagement = () => {
                       placeholder="Введите название продукта"
                     />
                   </div>
-                  
+
                   <div className="products-form-group">
                     <label>Цена (₸) *</label>
                     <input
@@ -247,7 +298,7 @@ const ProductsManagement = () => {
                       min="0"
                     />
                   </div>
-                  
+
                   <div className="products-form-group">
                     <label>Категория *</label>
                     <select
@@ -262,32 +313,20 @@ const ProductsManagement = () => {
                       ))}
                     </select>
                   </div>
-                  
-                  <div className="products-form-group">
-                    <label>Ингредиенты</label>
-                    <textarea
-                      name="ingredients"
-                      value={editFormData.ingredients}
-                      onChange={handleInputChange}
-                      className="products-form-input products-textarea"
-                      placeholder="Введите ингредиенты продукта..."
-                      rows="2"
-                    />
-                  </div>
-                  
-                  <div className="products-form-group">
-                    <label>Количество в наличии</label>
-                    <input
-                      type="number"
-                      name="quantity"
-                      value={editFormData.quantity}
-                      onChange={handleInputChange}
-                      className="products-form-input"
-                      placeholder="Количество"
-                      min="0"
-                    />
-                  </div>
-                  
+
+                  {editFormData.category === 'Другое...' && (
+                    <div className="products-form-group">
+                      <label>Своя категория *</label>
+                      <input
+                        type="text"
+                        value={customCategory}
+                        onChange={(e) => setCustomCategory(e.target.value)}
+                        className="products-form-input"
+                        placeholder="Введите название категории"
+                      />
+                    </div>
+                  )}
+
                   <div className="products-form-group">
                     <label>Статус</label>
                     <select
@@ -300,26 +339,69 @@ const ProductsManagement = () => {
                       <option value="inactive">Неактивный</option>
                     </select>
                   </div>
+
+                  <div className="products-form-group">
+                    <label>Заведение *</label>
+                    <select
+                      name="restaurant_id"
+                      value={editFormData.restaurant_id}
+                      onChange={handleInputChange}
+                      className="products-form-input products-select-input"
+                    >
+                      <option value="">Выберите заведение</option>
+                      {restaurants.map(restaurant => (
+                        <option key={restaurant.id} value={restaurant.id}>
+                          {restaurant.company_name || restaurant.companyName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="products-form-group">
+                    <label>Количество в наличии</label>
+                    <input
+                      type="number"
+                      name="quantity"
+                      value={editFormData.quantity}
+                      onChange={handleInputChange}
+                      className="products-form-input"
+                      placeholder="Количество"
+                      min="0"
+                    />
+                  </div>
+
+                  <div className="products-form-group" style={{ gridColumn: 'span 2' }}>
+                    <label>Ингредиенты</label>
+                    <textarea
+                      name="ingredients"
+                      value={editFormData.ingredients}
+                      onChange={handleInputChange}
+                      className="products-form-input products-textarea"
+                      placeholder="Введите ингредиенты продукта..."
+                      rows="3"
+                    />
+                  </div>
                 </div>
               </div>
-              
+
               <div className="products-modal-actions">
                 <button className="products-cancel-btn" onClick={handleCancelEdit}>
                   Отмена
                 </button>
                 <button className="products-save-btn" onClick={handleSaveEdit}>
-                  Сохранить изменения
+                  {isCreateModalOpen ? 'Создать продукт' : 'Сохранить изменения'}
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Сетка продуктов */}
         <div className="products-grid-container">
           {filteredProducts.map((product, index) => (
-            <div 
-              key={product.id} 
+            <div
+              key={product.article}
               className={`product-card-item ${product.status === 'inactive' ? 'product-inactive' : ''}`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
@@ -337,46 +419,45 @@ const ProductsManagement = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="product-content-wrapper">
                 <div className="product-header-info">
                   <h3 className="product-name-title">{product.name}</h3>
                   <span className="product-category-badge">{product.category}</span>
                 </div>
-                
+
                 {/* Ингредиенты показываются только если есть */}
                 {product.ingredients && (
                   <p className="product-description-text">
                     {product.ingredients}
                   </p>
                 )}
-                
+
                 <div className="product-company-info">
                   <span className="product-company-badge">
-                    {product.companyName}
+                    {product.company_name || product.companyName}
                   </span>
                 </div>
-                
+
                 <div className="product-details-wrapper">
                   <div className="product-price-info">
                     <div className="product-current-price">{formatPrice(product.price)} ₸</div>
                   </div>
-                  
+
                   <div className="product-meta-info">
                     {product.quantity !== undefined && (
                       <div className="product-quantity-info">
                         В наличии: {product.quantity}
                       </div>
                     )}
-                    {product.createdAt && (
+                    {product.updated_at && (
                       <div className="product-date-info">
-                        Добавлен: {new Date(product.createdAt).toLocaleDateString('ru-RU')}
+                        Обновлен: {new Date(product.updated_at).toLocaleDateString('ru-RU')}
                       </div>
                     )}
                   </div>
                 </div>
-                
-                {/* Только кнопки Редактировать и Удалить */}
+
                 <div className="product-actions-wrapper">
                   <button
                     className="product-action-btn product-edit-action-btn"
@@ -386,7 +467,7 @@ const ProductsManagement = () => {
                   </button>
                   <button
                     className="product-action-btn product-delete-action-btn"
-                    onClick={() => handleDeleteProduct(product.id, product.companyId)}
+                    onClick={() => handleDeleteProduct(product.article)}
                   >
                     Удалить
                   </button>
@@ -395,7 +476,7 @@ const ProductsManagement = () => {
             </div>
           ))}
         </div>
-        
+
         {filteredProducts.length === 0 && (
           <div className="products-no-data">
             <p>Продукты не найдены</p>
